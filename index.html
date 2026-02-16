@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>PayéCash · Caisse Réaliste (Catalogue + Poids + Arrondi)</title>
+  <title>PayéCash · Caisse Réaliste (Catalogue + Caisse simple)</title>
   <style>
     :root{
       --bg:#0b1020;
@@ -84,7 +84,7 @@
       margin:0;
       font-size:14px;
       color:var(--muted);
-      font-weight:950;
+      font-weight:980;
       letter-spacing:.25px;
       text-transform:uppercase;
     }
@@ -260,14 +260,17 @@
     }
     .chip:hover{ background: rgba(255,255,255,.10); }
     .monoSmall{ font-family:var(--mono); font-size:12px; color:var(--muted); }
+
     .checklist label{ display:flex; gap:10px; align-items:flex-start; padding:8px 10px; border:1px solid var(--line); border-radius:14px; background: rgba(255,255,255,.04); }
     .checklist input[type="checkbox"]{ margin-top:3px; }
+
+    .subtabs{ display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
   </style>
 </head>
 
 <body>
 <header>
-  <h1>🪙 PayéCash <span class="pill">catalogue + poids + arrondi</span></h1>
+  <h1>🪙 PayéCash <span class="pill">catalogue + caisse simple</span></h1>
   <div class="row">
     <span class="badge">⏱️ <span id="timer">00:00</span></span>
     <span class="badge">🎯 Série <span id="streak">0</span></span>
@@ -368,98 +371,175 @@
 
         <div class="grid2">
           <div>
-            <div class="muted">Ajout rapide depuis le catalogue (ton magasin)</div>
-            <div class="note">Recherche + ajout au poids ou à l’unité, promos incluses.</div>
+            <div class="muted">Mode Vraie caisse</div>
+            <div class="note">Choisis: Catalogue (produits) ou Caisse simple (juste Total + Payé).</div>
           </div>
           <div>
-            <div class="muted">Paiement client</div>
-            <input id="tillPaidInput" inputmode="decimal" placeholder="Ex: 50,00" />
-            <div class="note">Tu peux écrire avec virgule.</div>
-          </div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div class="grid2">
-          <div>
-            <input id="catalogSearch" placeholder="Rechercher (ex: nougat, bière, muscat…)" />
-          </div>
-          <div class="row" style="justify-content:flex-end">
-            <select id="catalogSelect"></select>
-          </div>
-        </div>
-
-        <div class="grid2" style="margin-top:10px">
-          <div>
-            <div class="muted">Détails produit</div>
-            <div class="result" id="catalogInfo" style="min-height:64px"></div>
-          </div>
-          <div>
-            <div class="muted">Quantité</div>
-            <div class="grid2">
-              <input id="catalogQty" inputmode="decimal" placeholder="Qté (ex: 1, 2, 3…)" />
-              <input id="catalogGrams" inputmode="decimal" placeholder="Grammes (si au poids)" />
+            <div class="muted">Sous-mode</div>
+            <div class="subtabs">
+              <div class="tab active" id="subCatalog" role="tab" aria-selected="true">Catalogue</div>
+              <div class="tab" id="subSimple" role="tab" aria-selected="false">Caisse simple</div>
             </div>
-            <div class="row" style="margin-top:10px">
-              <button class="btn primary" id="catalogAdd">Ajouter</button>
-              <button class="btn" id="applyDeal">Appliquer promo</button>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <!-- CATALOG SUBMODE -->
+        <div id="catalogSubPanel">
+          <div class="grid2">
+            <div>
+              <div class="muted">Ajout rapide depuis le catalogue (ton magasin)</div>
+              <div class="note">Recherche + ajout au poids ou à l’unité, promos incluses.</div>
             </div>
-            <div class="note" id="dealHint"></div>
+            <div>
+              <div class="muted">Paiement client</div>
+              <input id="tillPaidInput" inputmode="decimal" placeholder="Ex: 50,00" />
+              <div class="note">Tu peux écrire avec virgule.</div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="grid2">
+            <div>
+              <input id="catalogSearch" placeholder="Rechercher (ex: nougat, bière, muscat…)" />
+            </div>
+            <div class="row" style="justify-content:flex-end">
+              <select id="catalogSelect"></select>
+            </div>
+          </div>
+
+          <div class="grid2" style="margin-top:10px">
+            <div>
+              <div class="muted">Détails produit</div>
+              <div class="result" id="catalogInfo" style="min-height:64px"></div>
+            </div>
+            <div>
+              <div class="muted">Quantité</div>
+              <div class="grid2">
+                <input id="catalogQty" inputmode="decimal" placeholder="Qté (ex: 1, 2, 3…)" />
+                <input id="catalogGrams" inputmode="decimal" placeholder="Grammes (si au poids)" />
+              </div>
+              <div class="row" style="margin-top:10px">
+                <button class="btn primary" id="catalogAdd">Ajouter</button>
+                <button class="btn" id="applyDeal">Appliquer promo</button>
+              </div>
+              <div class="note" id="dealHint"></div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <table aria-label="Articles">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Libellé</th>
+                <th class="cell-mini">Prix</th>
+                <th class="cell-mini">Qté / g</th>
+                <th class="cell-mid">Total ligne</th>
+                <th class="cell-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="itemsBody"></tbody>
+          </table>
+
+          <div class="row" style="margin-top:10px; justify-content:space-between">
+            <div class="row">
+              <button class="btn small" id="addUnit">+ Unité</button>
+              <button class="btn small" id="addWeight">+ Poids</button>
+              <button class="btn small" id="addDirect">+ Montant</button>
+              <button class="btn small danger" id="clearItems">Tout effacer</button>
+            </div>
+            <div class="badge">Total: <span class="mono" id="tillTotal">0,00 €</span></div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="grid2">
+            <div class="hint">
+              <div style="font-weight:980;margin-bottom:6px">Résultat caisse</div>
+              <div>Total: <span class="mono" id="tillTotal2">0,00 €</span></div>
+              <div>Payé: <span class="mono" id="tillPaid2">0,00 €</span></div>
+              <div style="margin-top:6px">Monnaie à rendre: <span class="mono" id="tillChange">0,00 €</span></div>
+              <div class="note" id="tillWarn" style="margin-top:8px"></div>
+              <div class="sep"></div>
+              <div class="monoSmall" id="tvaInfo">TVA: 20% uniquement alcool + nougat (aide-mémoire).</div>
+            </div>
+
+            <div class="hint" id="tillSuggestion">
+              <div style="font-weight:980;margin-bottom:6px">Suggestion d’arrondi (anti-pièces)</div>
+              <div id="tillSuggestionText" class="monoSmall">Ajoute des articles et un paiement pour voir une proposition.</div>
+              <div class="sep"></div>
+              <div class="muted">Phrases FR/ES (clic = copie l’appoint)</div>
+              <div style="margin-top:10px" class="chips" id="tillPhrases"></div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+          <div class="note">
+            “Panier compter 2€” + “Enveloppe du soir: date en haut, SPN au milieu, CA en bas” (notes patron).
           </div>
         </div>
 
-        <div class="sep"></div>
-
-        <table aria-label="Articles">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Libellé</th>
-              <th class="cell-mini">Prix</th>
-              <th class="cell-mini">Qté / g</th>
-              <th class="cell-mid">Total ligne</th>
-              <th class="cell-actions">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="itemsBody"></tbody>
-        </table>
-
-        <div class="row" style="margin-top:10px; justify-content:space-between">
-          <div class="row">
-            <button class="btn small" id="addUnit">+ Unité</button>
-            <button class="btn small" id="addWeight">+ Poids</button>
-            <button class="btn small" id="addDirect">+ Montant</button>
-            <button class="btn small danger" id="clearItems">Tout effacer</button>
-          </div>
-          <div class="badge">Total: <span class="mono" id="tillTotal">0,00 €</span></div>
-        </div>
-
-        <div class="sep"></div>
-
-        <div class="grid2">
-          <div class="hint">
-            <div style="font-weight:980;margin-bottom:6px">Résultat caisse</div>
-            <div>Total: <span class="mono" id="tillTotal2">0,00 €</span></div>
-            <div>Payé: <span class="mono" id="tillPaid2">0,00 €</span></div>
-            <div style="margin-top:6px">Monnaie à rendre: <span class="mono" id="tillChange">0,00 €</span></div>
-            <div class="note" id="tillWarn" style="margin-top:8px"></div>
-            <div class="sep"></div>
-            <div class="monoSmall" id="tvaInfo">TVA: 20% uniquement alcool + nougat (aide-mémoire).</div>
+        <!-- SIMPLE CASHIER SUBMODE -->
+        <div id="simpleSubPanel" style="display:none">
+          <div class="grid2">
+            <div>
+              <div class="muted">Total à encaisser</div>
+              <input id="simpleTotalInput" inputmode="decimal" placeholder="Ex: 31,75" />
+              <div class="note">Tu peux aussi utiliser “Ajouter montant” pour cumuler des prix.</div>
+            </div>
+            <div>
+              <div class="muted">Payé par le client</div>
+              <input id="simplePaidInput" inputmode="decimal" placeholder="Ex: 50,00" />
+              <div class="note">Billets et pièces, peu importe: tu saisis juste le total donné.</div>
+            </div>
           </div>
 
-          <div class="hint" id="tillSuggestion">
-            <div style="font-weight:980;margin-bottom:6px">Suggestion d’arrondi (anti-pièces)</div>
-            <div id="tillSuggestionText" class="monoSmall">Ajoute des articles et un paiement pour voir une proposition.</div>
-            <div class="sep"></div>
-            <div class="muted">Phrases FR/ES (clic = copie l’appoint)</div>
-            <div style="margin-top:10px" class="chips" id="tillPhrases"></div>
+          <div class="row" style="margin-top:10px; justify-content:space-between">
+            <div class="row">
+              <button class="btn primary" id="simpleCompute">Calculer</button>
+              <button class="btn small" id="simpleClear">Effacer</button>
+            </div>
+            <div class="badge">À rendre: <span class="mono" id="simpleChange">—</span></div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="grid2">
+            <div class="hint">
+              <div style="font-weight:980;margin-bottom:6px">Suggestion d’arrondi</div>
+              <div class="monoSmall" id="simpleSuggestionText">Renseigne Total + Payé, puis “Calculer”.</div>
+              <div class="sep"></div>
+              <div class="muted">Phrases FR/ES (clic = copie l’appoint)</div>
+              <div style="margin-top:10px" class="chips" id="simplePhrases"></div>
+            </div>
+
+            <div class="hint">
+              <div style="font-weight:980;margin-bottom:6px">Addition rapide (optionnel)</div>
+              <div class="grid2">
+                <input id="simpleAddAmount" inputmode="decimal" placeholder="Montant à ajouter (ex: 6,90)" />
+                <button class="btn" id="simpleAddBtn">Ajouter</button>
+              </div>
+              <div class="note">Pratique si tu tapes des prix “au fil de l’eau”.</div>
+              <div class="sep"></div>
+              <div class="result" id="simpleList" style="min-height:84px"></div>
+              <div class="row" style="margin-top:10px; justify-content:space-between">
+                <button class="btn small danger" id="simpleListClear">Vider la liste</button>
+                <div class="badge">Somme: <span class="mono" id="simpleListSum">0,00 €</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="sep"></div>
+
+          <div class="note">
+            Astuce cerveau: “compléter” (31,75 → 32,00 → 40 → 50). Même quand tu utilises la caisse simple, pense en marches.
           </div>
         </div>
 
-        <div class="sep"></div>
-        <div class="note">
-          “Panier compter 2€” + “Enveloppe du soir: date en haut, SPN au milieu, CA en bas” (notes patron).
-        </div>
       </div>
 
       <!-- CHECKLIST -->
@@ -540,7 +620,7 @@
 </div>
 
 <footer>
-  1 fichier, 0 serveur. Catalogue basé sur tes notes (produits + prix + promos). Si tu veux, on peut ensuite ajouter un vrai “ticket imprimable” et un mode “sans total affiché”.
+  1 fichier, 0 serveur. Caisse simple = Total + Payé, et suggestion d’appoint pour rendre plus “rond”.
 </footer>
 
 <script>
@@ -590,14 +670,7 @@
   };
 
   // ---------------- Catalogue (d'après tes notes) ----------------
-  // Types:
-  // - "weight": pricePerKgC + grams
-  // - "unit": priceC + qty
-  // Deals:
-  // - unitDeals: array { buy, payCents, note }
-  // - weightDeals: optional (not used here)
   const CATALOG = [
-    // PÂTISSERIES AU POIDS
     { id:"gateaux_patis", type:"weight", nameFR:"Gâteaux pâtissiers (rousquilles)", nameES:"Pasteles (rosquillas)", pricePerKgC:4000, vat20:false,
       noteFR:"Prix au kilo 40€ (en sachet). Sauf cerise/abricot et rousquillettes: 45€/kg.", noteES:"40€/kg. Excepto cereza/albaricoque y 'rousquillettes': 45€/kg." },
     { id:"gateaux_patis_special", type:"weight", nameFR:"Gâteaux pâtissiers (cerise/abricot/rousquillettes)", nameES:"Pasteles (cereza/albaricoque)", pricePerKgC:4500, vat20:false,
@@ -605,19 +678,17 @@
     { id:"gateau_broche", type:"weight", nameFR:"Gâteau à la broche", nameES:"Pastel a la broche", pricePerKgC:4490, vat20:false,
       noteFR:"Prix au kilo 44,90€.", noteES:"44,90€/kg." },
 
-    // NOUGATS / TURRON / CHOCOLATS (au poids)
     { id:"nougat", type:"weight", nameFR:"Nougat", nameES:"Turrón (nougat)", pricePerKgC:5900, vat20:true,
       noteFR:"5,90€ les 100g (≈59€/kg).", noteES:"5,90€ / 100g (≈59€/kg)." },
     { id:"nougat_cube", type:"weight", nameFR:"Nougat petit cube", nameES:"Turrón (cubitos)", pricePerKgC:5900, vat20:true,
-      noteFR:"5,90€ les 100g. Cornet 12 (les 2 à 20€). Dans un cornet: ~200g (note).", noteES:"5,90€/100g. Cono 12: 2 por 20€." },
+      noteFR:"5,90€ les 100g. Cornet 12 (les 2 à 20€).", noteES:"5,90€/100g. Cono 12: 2 por 20€." },
     { id:"turron", type:"weight", nameFR:"Turron (miel/amande)", nameES:"Turrón (miel/almendra)", pricePerKgC:5900, vat20:true,
       noteFR:"5,90€ les 100g (≈59€/kg).", noteES:"5,90€/100g (≈59€/kg)." },
     { id:"chocolats", type:"weight", nameFR:"Chocolats (cornet / 100g)", nameES:"Chocolates (100g)", pricePerKgC:5900, vat20:false,
-      noteFR:"5,90€ les 100g (≈59€/kg). Cornet 12: les 2 à 20€ (possible mix avec nougat).", noteES:"5,90€/100g. Cono 12: 2 por 20€." },
+      noteFR:"5,90€ les 100g (≈59€/kg). Cornet 12: les 2 à 20€.", noteES:"5,90€/100g. Cono 12: 2 por 20€." },
 
-    // UNITAIRES
     { id:"gateaux_esat", type:"unit", nameFR:"Gâteaux de l’ESAT (paquet)", nameES:"Galletas ESAT (paquete)", priceC:690, vat20:false,
-      noteFR:"6,90€ le paquet. Offre: les 2 à 12€ au choix.", noteES:"6,90€ el paquete. Oferta: 2 por 12€." ,
+      noteFR:"6,90€ le paquet. Offre: les 2 à 12€ au choix.", noteES:"6,90€ el paquete. Oferta: 2 por 12€.",
       unitDeals:[{buy:2, payCents:1200, noteFR:"2 pour 12€", noteES:"2 por 12€"}]
     },
     { id:"biere_petite", type:"unit", nameFR:"Bière (petite)", nameES:"Cerveza (pequeña)", priceC:450, vat20:true,
@@ -637,18 +708,16 @@
       unitDeals:[{buy:3, payCents:1200, noteFR:"3 pour 12€", noteES:"3 por 12€"}]
     },
     { id:"miel", type:"unit", nameFR:"Miel (pot)", nameES:"Miel (tarro)", priceC:1200, vat20:false,
-      noteFR:"12€ le pot. Récolte française (Camélas).", noteES:"12€ el tarro." },
+      noteFR:"12€ le pot.", noteES:"12€ el tarro." },
     { id:"confiture", type:"unit", nameFR:"Confiture (pot)", nameES:"Mermelada (tarro)", priceC:690, vat20:false,
       noteFR:"6,90€ le pot (BIO).", noteES:"6,90€ el tarro (BIO)." },
 
-    // VINS (seul prix noté clairement)
     { id:"muscat", type:"unit", nameFR:"Muscat de Rivesaltes", nameES:"Moscatel de Rivesaltes", priceC:1500, vat20:true,
-      noteFR:"15€ pièce. Offre notée: les 2 à 25€ (mix possible).", noteES:"15€ unidad. Oferta: 2 por 25€ (mix posible).",
+      noteFR:"15€ pièce. Offre: les 2 à 25€ (mix possible).", noteES:"15€ unidad. Oferta: 2 por 25€.",
       unitDeals:[{buy:2, payCents:2500, noteFR:"2 pour 25€", noteES:"2 por 25€"}]
     },
-    // Petits plus
     { id:"panier", type:"unit", nameFR:"Panier (compter)", nameES:"Cesta", priceC:200, vat20:false,
-      noteFR:"Panier compter 2€ (note patron).", noteES:"Cesta 2€." }
+      noteFR:"Panier compter 2€.", noteES:"Cesta 2€." }
   ];
 
   function displayName(item){
@@ -723,7 +792,7 @@
     return steps;
   }
 
-  // Smart rounding: ask 1..99 cents to reduce coins / make round euros.
+  // Smart rounding: ask 1..99 cents to reduce coins or make round euros.
   function suggestRounding(totalCents, paidCents){
     if(paidCents < totalCents) return null;
     const change = paidCents - totalCents;
@@ -757,11 +826,8 @@
   }
 
   // ---------------- Deals (unit) ----------------
-  // Applies best deal for quantity for a single product line.
   function computeUnitLineTotalWithDeals(priceC, qty, deals){
     if(!deals || !deals.length) return {totalC: priceC*qty, dealApplied:null};
-
-    // simple: choose the deal that minimizes total
     let best = {totalC: priceC*qty, dealApplied:null};
     for(const d of deals){
       const packs = Math.floor(qty / d.buy);
@@ -793,7 +859,6 @@
     const n = randInt(cfg.itemsMin, cfg.itemsMax);
     const items = [];
 
-    // Weighted selection: more day-to-day items
     const pool = [
       ...CATALOG.filter(p=>["gateaux_patis","gateaux_patis_special","gateau_broche","nougat","chocolats","turron"].includes(p.id)).flatMap(x=>Array(3).fill(x)),
       ...CATALOG.filter(p=>["gateaux_esat","tapenade","terrine","confiture","miel","biere_petite","biere_grande"].includes(p.id)).flatMap(x=>Array(4).fill(x)),
@@ -803,7 +868,6 @@
     for(let i=0;i<n;i++){
       const prod = pick(pool);
       if(prod.type==='weight'){
-        // grams: realistic, and more grams for cakes
         let gMin=80, gMax=600;
         if(prod.id.includes("gateau")){ gMin=120; gMax=850; }
         if(prod.id.includes("nougat") || prod.id==="chocolats" || prod.id==="turron"){ gMin=90; gMax=420; }
@@ -821,10 +885,9 @@
         });
       } else {
         let qty = randInt(1,3);
-        // sometimes more for promo items
         if(prod.unitDeals && Math.random()<0.6){
-          qty = prod.unitDeals[0].buy; // exactly promo pack
-          if(Math.random()<0.25) qty += prod.unitDeals[0].buy; // double promo pack
+          qty = prod.unitDeals[0].buy;
+          if(Math.random()<0.25) qty += prod.unitDeals[0].buy;
         }
         const unit = computeUnitLineTotalWithDeals(prod.priceC, qty, prod.unitDeals);
         items.push({
@@ -843,7 +906,6 @@
 
     let total = items.reduce((s,it)=>s+it.amountC,0);
 
-    // Training-friendly cents at low levels (avoid 1-2 cents too often)
     if(cfg.level<=2){
       total = total - (total%5);
     } else if(cfg.level===3){
@@ -852,7 +914,6 @@
       if([6,7,8,9].includes(c)) total += (10-c);
     }
 
-    // Clamp
     if(total > cfg.maxTotal){
       const factor = cfg.maxTotal / total;
       total = Math.max(300, Math.floor(total*factor));
@@ -875,10 +936,9 @@
 
     let paid = pick(options.filter(x=>x>=totalCents));
 
-    // sometimes customer gives a bit odd amount (e.g. 50.00 + 0.20)
     if(cfg.level>=4 && Math.random()<0.18){
-      const extra = pick([10,20,50,100,200]); // cents
-      if(paid+extra <= paid+500) paid += extra;
+      const extra = pick([10,20,50,100,200]);
+      paid += extra;
     }
 
     let breakdown = [paid];
@@ -905,11 +965,11 @@
   }
 
   // ---------------- App state / stats ----------------
-  const LS_KEY_STATS = 'payecash_stats_v3';
+  const LS_KEY_STATS = 'payecash_stats_v4';
   const LS_KEY_CHECK = 'payecash_check_v1';
 
   const state = {
-    mode: 'training', // training | till | checklist
+    mode: 'training',
     level: 3,
     showHints: true,
     showDetails: false,
@@ -917,7 +977,9 @@
     timerInt: null,
     trainingCase: null,
     stats: null,
-    tillItems: []
+    tillItems: [],
+    tillSubmode: 'catalog', // catalog | simple
+    simpleList: []
   };
 
   function loadStats(){
@@ -977,6 +1039,25 @@
       'Checklist';
   }
 
+  function setTillSubmode(sub){
+    state.tillSubmode = sub;
+    const isCatalog = sub==='catalog';
+
+    el('subCatalog').classList.toggle('active', isCatalog);
+    el('subSimple').classList.toggle('active', !isCatalog);
+    el('subCatalog').setAttribute('aria-selected', isCatalog ? 'true' : 'false');
+    el('subSimple').setAttribute('aria-selected', !isCatalog ? 'true' : 'false');
+
+    el('catalogSubPanel').style.display = isCatalog ? 'block' : 'none';
+    el('simpleSubPanel').style.display = isCatalog ? 'none' : 'block';
+
+    if(!isCatalog){
+      updateSimpleCashier();
+    } else {
+      updateTillSummary();
+    }
+  }
+
   // ---------------- Training UI ----------------
   function setFeedback(obj){
     const fb = el('feedback');
@@ -1018,7 +1099,6 @@
     el('hintBlock').textContent = hint;
     el('hintBlock').style.display = state.showHints ? 'block' : 'none';
 
-    // chips phrases
     const L = PHRASES[langNow()] || PHRASES.fr;
     const qp = el('quickPhrases');
     qp.innerHTML='';
@@ -1100,7 +1180,6 @@
         expectedChange = sug.newChange;
       }
     } else {
-      // suggest optional: accept good rounding even if not optimal
       if(userProposes && c.totalCents + ask <= c.paidCents){
         const newChange = c.paidCents - (c.totalCents + ask);
         const base = countCoinsBills(baseChange);
@@ -1155,7 +1234,7 @@
     }
   }
 
-  // ---------------- Till mode ----------------
+  // ---------------- Till mode (catalog) ----------------
   function makeRow(item, idx){
     const tr = document.createElement('tr');
 
@@ -1308,8 +1387,7 @@
       d.textContent=t;
       d.addEventListener('click', ()=>{
         if(appointToCopyCents!=null){
-          const v = centsToInput(appointToCopyCents);
-          navigator.clipboard?.writeText(v);
+          navigator.clipboard?.writeText(centsToInput(appointToCopyCents));
         }
       });
       container.appendChild(d);
@@ -1398,7 +1476,7 @@
     renderTill();
   }
 
-  // ---------------- Catalogue UI (till mode) ----------------
+  // ---------------- Catalogue UI ----------------
   function refreshCatalogSelect(filterText=''){
     const s = el('catalogSelect');
     s.innerHTML='';
@@ -1445,19 +1523,16 @@
     el('catalogInfo').textContent =
       `${name}\n${priceLine}\n${deals ? ('Promo: '+deals+'\n') : ''}${vat}\n\n${note || ''}`.trim();
 
-    // hints for qty/grams
     if(p.type==='weight'){
       el('catalogGrams').disabled = false;
       el('catalogQty').disabled = true;
       el('catalogQty').value = '';
-      el('catalogGrams').placeholder = 'Grammes (ex: 200)';
-      el('dealHint').textContent = deals ? `Promo disponible (souvent à l’unité). Ici: ${deals}` : 'Produit au poids.';
+      el('dealHint').textContent = deals ? `Promo dispo: ${deals}` : 'Produit au poids.';
     } else {
       el('catalogGrams').disabled = true;
       el('catalogQty').disabled = false;
       el('catalogGrams').value = '';
-      el('catalogQty').placeholder = 'Qté (ex: 1, 2, 3)';
-      el('dealHint').textContent = deals ? `Astuce: la promo s’applique au calcul de ligne (${deals}).` : 'Produit à l’unité.';
+      el('dealHint').textContent = deals ? `Astuce: promo possible (${deals}).` : 'Produit à l’unité.';
     }
     el('applyDeal').disabled = !(p.unitDeals && p.unitDeals.length && p.type==='unit');
   }
@@ -1489,10 +1564,82 @@
     renderTill();
   }
 
+  // ---------------- Simple cashier ----------------
+  function renderSimpleList(){
+    const list = state.simpleList;
+    const lines = list.map((c,i)=> `${i+1}. ${euroText(c)}`).join('\n');
+    el('simpleList').textContent = ifEmpty(lines, 'Aucun montant ajouté.');
+    const sum = list.reduce((a,b)=>a+b,0);
+    el('simpleListSum').textContent = euroText(sum);
+
+    // If user wants, auto-fill total with list sum when total is empty
+    const currentTotal = parseEurosToCents(el('simpleTotalInput').value);
+    if((currentTotal===null || currentTotal===0) && sum>0){
+      el('simpleTotalInput').value = centsToInput(sum);
+    }
+  }
+
+  function ifEmpty(str, fallback){ return (str && str.trim().length) ? str : fallback; }
+
+  function updateSimpleCashier(){
+    const totalC = parseEurosToCents(el('simpleTotalInput').value) ?? 0;
+    const paidC = parseEurosToCents(el('simplePaidInput').value) ?? 0;
+
+    const L = PHRASES[langNow()] || PHRASES.fr;
+    el('simplePhrases').innerHTML = '';
+
+    if(totalC<=0){
+      el('simpleChange').textContent = '—';
+      el('simpleSuggestionText').textContent = 'Renseigne un Total (ou ajoute des montants).';
+      return;
+    }
+    if(paidC<=0){
+      el('simpleChange').textContent = '—';
+      el('simpleSuggestionText').textContent = 'Renseigne le Payé du client.';
+      return;
+    }
+    if(paidC < totalC){
+      el('simpleChange').textContent = '—';
+      el('simpleSuggestionText').textContent = `Paiement insuffisant: il manque ${euroText(totalC-paidC)}.`;
+      renderPhraseChips(el('simplePhrases'), [`${L.greet} · ${L.pay}`], null);
+      return;
+    }
+
+    const change = paidC - totalC;
+    el('simpleChange').textContent = euroText(change);
+
+    const sug = suggestRounding(totalC, paidC);
+    if(!sug){
+      el('simpleSuggestionText').textContent =
+        `Monnaie: ${euroText(change)}\nBillets/pièces: ${breakdownToString(makeBreakdown(change))}\nArrondi: pas utile.`;
+      renderPhraseChips(el('simplePhrases'), [
+        `${L.greet} · ${L.pay}`,
+        L.exact(centsToInput(change)),
+        L.thanks
+      ], null);
+      return;
+    }
+
+    const askTxt = centsToInput(sug.ask);
+    const promised = (sug.newChange%100===0) ? String(Math.floor(sug.newChange/100)) : centsToInput(sug.newChange);
+
+    el('simpleSuggestionText').textContent =
+      `Monnaie: ${euroText(change)} (${breakdownToString(makeBreakdown(change))})\n`+
+      `Arrondi conseillé: demander ${euroText(sug.ask)} → rendre ${euroText(sug.newChange)}\n`+
+      `(${breakdownToString(makeBreakdown(sug.newChange))})`;
+
+    renderPhraseChips(el('simplePhrases'), [
+      `${L.greet} · ${L.pay}`,
+      L.roundingAsk(askTxt),
+      L.roundingAsk2(askTxt, promised),
+      L.thanks
+    ], sug.ask);
+  }
+
   // ---------------- Checklist ----------------
   const CHECK_OPEN = [
     {id:"facing", text:"Facing du magasin régulièrement, charger le magasin (pas de trous)."},
-    {id:"notes_produits", text:"Relire notes produits (vins, gâteaux, nougat) si besoin."},
+    {id:"notes_produits", text:"Relire notes produits si besoin."},
     {id:"heures", text:"Noter ses heures quotidiennement."},
     {id:"demander_appoint", text:"Demander régulièrement la monnaie / l’appoint au client."},
     {id:"menage", text:"Ménage régulièrement."}
@@ -1522,8 +1669,6 @@
 
     const open = el('checklistOpen');
     const close = el('checklistClose');
-
-    // clear (keep title line already in HTML)
     open.innerHTML = '<div class="muted" style="margin-bottom:8px">Ouverture / journée</div>';
     close.innerHTML = '<div class="muted" style="margin-bottom:8px">Fermeture / soir</div>';
 
@@ -1559,12 +1704,15 @@
   el('tabTraining').addEventListener('click', ()=>setMode('training'));
   el('tabTill').addEventListener('click', ()=>{
     setMode('till');
-    updateTillSummary();
+    setTillSubmode(state.tillSubmode);
   });
   el('tabChecklist').addEventListener('click', ()=>{
     setMode('checklist');
     renderChecklist();
   });
+
+  el('subCatalog').addEventListener('click', ()=>setTillSubmode('catalog'));
+  el('subSimple').addEventListener('click', ()=>setTillSubmode('simple'));
 
   el('newCase').addEventListener('click', ()=> { if(state.mode==='training') newTrainingCase(); });
 
@@ -1595,11 +1743,11 @@
   });
 
   el('customerLang').addEventListener('change', ()=>{
-    // refresh catalog labels + info + training case
     refreshCatalogSelect(el('catalogSearch').value);
     if(state.mode==='training') newTrainingCase();
     renderCatalogInfo();
     updateTillSummary();
+    updateSimpleCashier();
   });
 
   el('resetStats').addEventListener('click', ()=>{
@@ -1634,6 +1782,36 @@
   el('catalogAdd').addEventListener('click', ()=> addFromCatalog(false));
   el('applyDeal').addEventListener('click', ()=> addFromCatalog(true));
 
+  // Simple cashier controls
+  el('simpleTotalInput').addEventListener('input', ()=>updateSimpleCashier());
+  el('simplePaidInput').addEventListener('input', ()=>updateSimpleCashier());
+  el('simpleCompute').addEventListener('click', ()=>updateSimpleCashier());
+  el('simpleClear').addEventListener('click', ()=>{
+    el('simpleTotalInput').value='';
+    el('simplePaidInput').value='';
+    el('simpleChange').textContent='—';
+    el('simpleSuggestionText').textContent='Renseigne Total + Payé, puis “Calculer”.';
+    el('simplePhrases').innerHTML='';
+  });
+
+  el('simpleAddBtn').addEventListener('click', ()=>{
+    const c = parseEurosToCents(el('simpleAddAmount').value);
+    if(c===null){
+      el('simpleAddAmount').focus();
+      return;
+    }
+    state.simpleList.push(c);
+    el('simpleAddAmount').value='';
+    renderSimpleList();
+    updateSimpleCashier();
+  });
+
+  el('simpleListClear').addEventListener('click', ()=>{
+    state.simpleList = [];
+    renderSimpleList();
+    updateSimpleCashier();
+  });
+
   // Checklist controls
   el('checkAll').addEventListener('click', ()=> setAllChecks(true));
   el('uncheckAll').addEventListener('click', ()=> setAllChecks(false));
@@ -1653,6 +1831,13 @@
   });
 
   // ---------------- Boot ----------------
+  function refreshCatalogInfoDefaults(){
+    // enable/disable initial
+    el('catalogGrams').disabled = true;
+    el('catalogQty').disabled = false;
+    el('applyDeal').disabled = true;
+  }
+
   function boot(){
     state.stats = loadStats();
     renderStats();
@@ -1660,14 +1845,14 @@
 
     setMode('training');
 
-    // init catalog UI
+    refreshCatalogInfoDefaults();
     refreshCatalogSelect('');
     renderCatalogInfo();
 
-    // init till with one line
     addTillItem('unit');
+    renderSimpleList();
 
-    // start training
+    setTillSubmode('catalog');
     newTrainingCase();
   }
 
