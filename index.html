@@ -2,13 +2,11 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Simulateur Caisse Espèces</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>PayéCash · Simulateur Caisse Espèces</title>
   <style>
     :root{
       --bg:#0b1020;
-      --card:#121a33;
-      --card2:#0f1730;
       --txt:#e9ecff;
       --muted:#aab2e6;
       --accent:#7cf7d4;
@@ -21,24 +19,33 @@
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-    *{box-sizing:border-box}
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
     body{
       margin:0;
       font-family:var(--sans);
-      background: radial-gradient(1100px 700px at 20% 10%, rgba(124,247,212,.14), transparent 55%),
-                  radial-gradient(900px 600px at 90% 30%, rgba(138,162,255,.14), transparent 55%),
-                  var(--bg);
+      background:
+        radial-gradient(1100px 700px at 20% 10%, rgba(124,247,212,.14), transparent 55%),
+        radial-gradient(900px 600px at 90% 30%, rgba(138,162,255,.14), transparent 55%),
+        var(--bg);
       color:var(--txt);
       min-height:100vh;
+      padding-bottom: env(safe-area-inset-bottom);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+
     header{
       padding:18px 18px 10px;
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
     }
+
     h1{
       margin:0;
       font-size:18px;
@@ -46,6 +53,7 @@
       display:flex;
       gap:10px;
       align-items:center;
+      flex-wrap:wrap;
     }
     h1 .pill{
       font-size:12px;
@@ -53,8 +61,10 @@
       background:var(--accent);
       padding:5px 10px;
       border-radius:999px;
-      font-weight:700;
+      font-weight:800;
+      white-space:nowrap;
     }
+
     .wrap{
       max-width:1100px;
       margin:0 auto;
@@ -63,16 +73,16 @@
       grid-template-columns: 1.3fr .9fr;
       gap:16px;
     }
-    @media (max-width: 980px){
-      .wrap{grid-template-columns:1fr}
-    }
+
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
       border-radius: var(--radius);
       overflow:hidden;
+      min-width:0;
     }
+
     .card .head{
       padding:14px 14px 10px;
       border-bottom:1px solid var(--line);
@@ -80,30 +90,48 @@
       justify-content:space-between;
       align-items:flex-start;
       gap:10px;
+      flex-wrap:wrap;
     }
+
     .card .head h2{
       margin:0;
       font-size:14px;
       color:var(--muted);
-      font-weight:700;
+      font-weight:800;
       letter-spacing:.25px;
       text-transform:uppercase;
     }
+
     .card .body{ padding:14px; }
-    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    @media (max-width: 520px){
-      .grid2{grid-template-columns:1fr}
+
+    .grid2{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      min-width:0;
     }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      min-width:0;
+    }
+
     .mono{ font-family:var(--mono); }
     .big{
       font-size:30px;
-      font-weight:800;
+      font-weight:900;
       letter-spacing:.2px;
+      word-break: break-word;
     }
     .muted{ color:var(--muted); }
+
     .badge{
-      display:inline-flex; align-items:center; gap:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
       padding:6px 10px;
       border-radius:999px;
       background: rgba(255,255,255,.06);
@@ -111,7 +139,10 @@
       font-size:12px;
       color:var(--muted);
       user-select:none;
+      white-space:nowrap;
+      max-width:100%;
     }
+
     .btn{
       cursor:pointer;
       border:1px solid var(--line);
@@ -119,9 +150,10 @@
       color:var(--txt);
       padding:10px 12px;
       border-radius: 12px;
-      font-weight:700;
+      font-weight:800;
       transition: transform .05s ease, background .15s ease, border-color .15s ease;
       user-select:none;
+      touch-action: manipulation;
     }
     .btn:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.20); }
     .btn:active{ transform: translateY(1px); }
@@ -133,6 +165,7 @@
     .btn.danger{ border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.10); }
     .btn.small{ padding:8px 10px; border-radius: 10px; font-size:12px; }
     .btn.ghost{ background: transparent; }
+
     input, select{
       width:100%;
       background: rgba(0,0,0,.18);
@@ -141,11 +174,14 @@
       padding:10px 12px;
       border-radius: 12px;
       outline:none;
+      min-width:0;
+      font-size:16px; /* évite zoom iOS */
     }
     input:focus, select:focus{
       border-color: rgba(124,247,212,.45);
       box-shadow: 0 0 0 3px rgba(124,247,212,.14);
     }
+
     .kpi{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -156,9 +192,11 @@
       border-radius: 14px;
       border:1px solid var(--line);
       background: rgba(255,255,255,.04);
+      min-width:0;
     }
     .kpi .box .t{ font-size:12px; color:var(--muted); }
-    .kpi .box .v{ font-size:18px; font-weight:800; margin-top:4px; }
+    .kpi .box .v{ font-size:18px; font-weight:900; margin-top:4px; }
+
     .list{
       margin:10px 0 0;
       padding:0;
@@ -174,9 +212,12 @@
       justify-content:space-between;
       gap:10px;
       background: rgba(255,255,255,.03);
+      min-width:0;
     }
     .list li:last-child{ border-bottom:none; }
+
     .sep{ height:1px; background: var(--line); margin:12px 0; }
+
     .hint{
       padding:10px 12px;
       border-radius: 14px;
@@ -185,7 +226,9 @@
       color: var(--txt);
       font-size:13px;
       line-height:1.35;
+      overflow-wrap:anywhere;
     }
+
     .result{
       padding:10px 12px;
       border-radius: 14px;
@@ -194,10 +237,12 @@
       font-size:13px;
       line-height:1.45;
       white-space: pre-wrap;
+      overflow-wrap:anywhere;
     }
     .good{ border-color: rgba(78,224,122,.35); background: rgba(78,224,122,.08); }
     .bad{ border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.08); }
     .warn{ border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.08); }
+
     .chips{ display:flex; gap:8px; flex-wrap:wrap; }
     .chip{
       border:1px solid var(--line);
@@ -208,9 +253,16 @@
       color:var(--muted);
       cursor:pointer;
       user-select:none;
+      max-width:100%;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
     .chip:hover{ background: rgba(255,255,255,.10); }
+
     .monoSmall{ font-family:var(--mono); font-size:12px; color:var(--muted); }
+    .note{ font-size:12px; color:var(--muted); margin-top:6px; line-height:1.35; }
+
     footer{
       max-width:1100px;
       margin: 0 auto;
@@ -218,6 +270,7 @@
       color: var(--muted);
       font-size: 12px;
     }
+
     .kbd{
       font-family:var(--mono);
       font-size:12px;
@@ -226,28 +279,63 @@
       border:1px solid var(--line);
       background: rgba(0,0,0,.2);
       color: var(--txt);
+      display:inline-block;
+    }
+
+    @media (max-width: 980px){
+      .wrap{ grid-template-columns:1fr; }
+    }
+
+    @media (max-width: 560px){
+      header{ padding:14px 12px 8px; }
+      .wrap{ padding: 0 12px 18px; gap:12px; }
+      .card .body{ padding:12px; }
+      .card .head{ padding:12px 12px 8px; }
+      .grid2{ grid-template-columns:1fr; }
+      .big{ font-size:26px; }
+
+      /* boutons de la zone "actions" en colonne */
+      .actions .btn{ width:100%; justify-content:center; }
+
+      /* les petits boutons (header) restent compacts */
+      .btn.small{ width:auto; }
+    }
+
+    @media (max-width: 380px){
+      .big{ font-size:24px; }
+      h1{ font-size:16px; }
+      h1 .pill{ font-size:11px; }
     }
   </style>
 </head>
+
 <body>
   <header>
-    <h1>🪙 Simulateur Caisse Espèces <span class="pill">drill rapide</span></h1>
+    <h1>🪙 PayéCash <span class="pill">simulateur caisse</span></h1>
     <div class="row">
       <span class="badge">⏱️ <span id="timer">00:00</span></span>
       <span class="badge">🎯 Série <span id="streak">0</span></span>
       <span class="badge">📈 Niveau <span id="levelLabel">1</span></span>
+
+      <span class="badge">
+        🧑‍💼 Client
+        <select id="customerLang" style="width:auto; padding:6px 10px; border-radius:10px; font-size:14px">
+          <option value="fr">FR</option>
+          <option value="es">ES</option>
+        </select>
+      </span>
+
       <button class="btn small ghost" id="resetStats">Réinitialiser stats</button>
     </div>
   </header>
 
   <div class="wrap">
-    <!-- MAIN -->
     <section class="card">
       <div class="head">
         <h2>Scénario client</h2>
         <div class="row">
           <button class="btn small" id="newCase">Nouveau client</button>
-          <button class="btn small" id="toggleDetails">Masquer détails</button>
+          <button class="btn small" id="toggleDetails">Afficher détails</button>
           <button class="btn small" id="toggleHints">Aide ON</button>
         </div>
       </div>
@@ -269,7 +357,6 @@
         <div class="sep"></div>
 
         <div id="detailsBlock" class="result" style="display:none"></div>
-
         <div id="hintBlock" class="hint" style="display:none"></div>
 
         <div class="sep"></div>
@@ -283,14 +370,15 @@
               <option value="must">Obligatoire (le jeu te note)</option>
             </select>
 
-            <div style="margin-top:10px" class="chips" id="quickPhrases" aria-label="phrases d'arrondi"></div>
+            <div style="margin-top:10px" class="chips" id="quickPhrases" aria-label="phrases rapides"></div>
+            <div class="note">Mode ES: phrases rapides en espagnol (clic = pré-remplit le montant à demander pour arrondir).</div>
           </div>
 
           <div>
             <label class="muted">Ta réponse: monnaie à rendre (€)</label>
             <input id="answerInput" inputmode="decimal" placeholder="Ex: 18,25" />
 
-            <div class="row" style="margin-top:10px">
+            <div class="row actions" style="margin-top:10px">
               <button class="btn primary" id="check">Valider</button>
               <button class="btn" id="showSolution">Voir correction</button>
               <button class="btn danger" id="panic">Je panique 😵</button>
@@ -299,7 +387,7 @@
             <div style="margin-top:10px">
               <label class="muted">Optionnel: ce que tu demandes au client pour arrondir (€)</label>
               <input id="askInput" inputmode="decimal" placeholder="Ex: 0,25 (si tu proposes un arrondi)" />
-              <div class="monoSmall">Astuce: tu annonces toujours “Si vous avez X, je vous rends Y tout rond.”</div>
+              <div class="note">Astuce: annonce toujours les 2: “Si vous avez X, je vous rends Y tout rond.”</div>
             </div>
           </div>
         </div>
@@ -307,11 +395,9 @@
         <div class="sep"></div>
 
         <div id="feedback" class="result" style="display:none"></div>
-
       </div>
     </section>
 
-    <!-- SIDE -->
     <aside class="card">
       <div class="head">
         <h2>Progression</h2>
@@ -320,6 +406,7 @@
           <button class="btn small" id="levelUp">+</button>
         </div>
       </div>
+
       <div class="body">
         <div class="kpi">
           <div class="box">
@@ -343,7 +430,7 @@
         <div class="sep"></div>
 
         <div class="hint">
-          <div style="font-weight:800;margin-bottom:6px">Réflexe “compléter” (anti-retournage de cerveau)</div>
+          <div style="font-weight:900;margin-bottom:6px">Réflexe “compléter” (anti-retournage de cerveau)</div>
           <div>Tu pars du <b>total</b> et tu montes vers le <b>payé</b> en marches:</div>
           <ul style="margin:8px 0 0; padding-left:18px">
             <li>centimes → <b>… ,00</b></li>
@@ -359,6 +446,7 @@
           <div class="muted">Historique (10 derniers)</div>
           <button class="btn small" id="exportStats">Exporter JSON</button>
         </div>
+
         <ul class="list" id="history"></ul>
 
         <div class="sep"></div>
@@ -378,9 +466,11 @@
 <script>
 (() => {
   // ---------- Utils ----------
-  const € = (cents) => (cents/100).toFixed(2).replace('.', ',') + ' €';
+  const euroText = (cents) => (cents/100).toFixed(2).replace('.', ',') + ' €';
   const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
   const now = () => Date.now();
+  const el = (id)=>document.getElementById(id);
+  const langNow = () => document.getElementById('customerLang')?.value || 'fr';
 
   function parseEurosToCents(str){
     if(!str) return null;
@@ -393,20 +483,38 @@
     return euros*100 + parseInt(cents,10);
   }
 
-  function formatAskPhrase(askCents, changeRoundedCents){
-    // askCents: what we ask client to add; changeRoundedCents: change after rounding
+  function formatAskPhraseFR(askCents, changeRoundedCents){
     const ask = (askCents/100).toFixed(2).replace('.', ',');
-    const chg = Math.floor(changeRoundedCents/100).toString(); // rounded change is integer euros
+    const chg = Math.floor(changeRoundedCents/100).toString();
     return `“Si vous avez ${ask} €, ça m’arrange, je vous rends ${chg} € tout rond.”`;
   }
 
+  // ---------- Phrasebook (FR/ES) ----------
+  const PHRASES = {
+    fr: {
+      greet: "Bonjour 🙂",
+      pay: "Je paie en espèces.",
+      roundingAsk: (x) => `Vous auriez ${x} € ? Comme ça je vous rends tout rond.`,
+      roundingAsk2: (x,y) => `Si vous avez ${x} €, ça m’arrange, je vous rends ${y} € tout rond.`,
+      exact: (chg) => `Parfait, je vous rends ${chg} €.`,
+      thanks: "Merci, bonne journée !"
+    },
+    es: {
+      greet: "Hola 🙂",
+      pay: "Pago en efectivo.",
+      roundingAsk: (x) => `¿Tienes ${x} €? Así te devuelvo redondo.`,
+      roundingAsk2: (x,y) => `Si tienes ${x} €, mejor, así te devuelvo ${y} € justo.`,
+      exact: (chg) => `Perfecto, te devuelvo ${chg} €.`,
+      thanks: "¡Gracias, buen día!"
+    }
+  };
+
   // ---------- Money system ----------
-  const COINS = [200,100,50,20,10,5,2,1]; // cents
-  const BILLS = [50000,20000,10000,5000,2000,1000,500]; // cents
+  const COINS = [200,100,50,20,10,5,2,1];
+  const BILLS = [50000,20000,10000,5000,2000,1000,500];
   const DENOMS = [...BILLS, ...COINS];
 
   function makeChangeBreakdown(amountCents){
-    // Greedy breakdown for display (not mandatory optimal in all currency systems, but for EUR it works fine).
     let rest = amountCents;
     const out = [];
     for(const d of DENOMS){
@@ -419,16 +527,24 @@
     }
     return out;
   }
+
   function breakdownToString(bd){
-    if(!bd.length) return '0';
+    if(!bd || !bd.length) return '0';
     return bd.map(([d,k]) => {
       if(d>=100) return `${k}×${(d/100).toFixed(0)}€`;
       return `${k}×${d}c`;
     }).join(' + ');
   }
 
+  function denomListToString(list){
+    if(!list || !list.length) return '0';
+    const counts = new Map();
+    for(const d of list) counts.set(d, (counts.get(d)||0)+1);
+    const ordered = Array.from(counts.entries()).sort((a,b)=>b[0]-a[0]);
+    return ordered.map(([d,k]) => d>=100 ? `${k}×${(d/100).toFixed(0)}€` : `${k}×${d}c`).join(' + ');
+  }
+
   function countingUpSteps(totalCents, paidCents){
-    // Build steps: total -> next euro -> then to next 5/10/20/50... -> paid
     let cur = totalCents;
     const steps = [];
     const pushStep = (to) => {
@@ -438,29 +554,22 @@
       }
     };
 
-    // 1) to next euro
     const mod = cur % 100;
     if(mod !== 0) pushStep(cur + (100 - mod));
 
-    // 2) climb via "nice" paliers
-    // We'll repeatedly jump to next target among: next 5€, 10€, 20€, 50€... without overshooting
-    const niceEuroTargets = [5,10,20,50,100,200,500]; // euros
+    const niceEuroTargets = [5,10,20,50,100,200,500];
     while(cur < paidCents){
       const curEuro = Math.floor(cur/100);
-      // propose next targets in euros
       const candidates = [];
-      // next 1€
       candidates.push((curEuro+1)*100);
       for(const t of niceEuroTargets){
         const next = (Math.floor(curEuro / t) + 1)*t*100;
         candidates.push(next);
       }
-      // choose the largest candidate that is <= paid
       let best = null;
       for(const c of candidates){
         if(c<=paidCents && c>cur) best = best===null ? c : Math.max(best, c);
       }
-      // if none, just go straight to paid
       if(best===null) best = paidCents;
       pushStep(best);
       if(best===paidCents) break;
@@ -468,17 +577,13 @@
     return steps;
   }
 
-  // ---------- Scenario generation ----------
-  const DEFAULTS = {
-    level: 1,
-    showHints: true,
-    showDetails: false
-  };
+  // ---------- State / Stats ----------
+  const DEFAULTS = { level: 1, showHints: true, showDetails: false };
 
   const state = {
-    level: 1,
-    showHints: true,
-    showDetails: false,
+    level: DEFAULTS.level,
+    showHints: DEFAULTS.showHints,
+    showDetails: DEFAULTS.showDetails,
     case: null,
     startTime: null,
     timerInt: null,
@@ -492,108 +597,87 @@
     if(raw){
       try { return JSON.parse(raw); } catch(e){}
     }
-    return {
-      solved: 0,
-      correct: 0,
-      mistakes: 0,
-      streak: 0,
-      bestStreak: 0,
-      timesMs: [],
-      history: [] // newest first
-    };
+    return { solved:0, correct:0, mistakes:0, streak:0, bestStreak:0, timesMs:[], history:[] };
   }
+
   function saveStats(){
     localStorage.setItem(LS_KEY, JSON.stringify(state.stats));
   }
 
   function levelConfig(level){
-    // Focus: increase difficulty by adding 1/2/5 centimes, mixed payments, heavier baskets
-    const cfg = {
+    return {
       level,
       maxItems: clamp(2 + level, 3, 9),
       allow1c2c: level >= 3,
-      allowOddCents: level >= 2,
       allowMixedPay: level >= 2,
       allowBigBills: level >= 4,
       maxTotalCents: [2000, 3500, 6000, 12000, 20000][clamp(level-1,0,4)]
     };
-    return cfg;
   }
 
   function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
+  // ---------- Scenario generation ----------
   function generateBasket(cfg){
-    // Items: weighted goods + unit goods
     const items = [];
     const n = randInt(2, cfg.maxItems);
+
+    const namesWeight = {
+      fr: ['Fromage','Jambon','Olives','Amandes','Fruits secs','Saucisson','Bonbons','Thé','Café','Tomates'],
+      es: ['Queso','Jamón','Aceitunas','Almendras','Frutos secos','Fuet','Caramelos','Té','Café','Tomates']
+    };
+    const namesUnit = {
+      fr: ['Confiture','Miel','Biscuit','Soda','Pain','Chocolat','Savon','Pâté','Terrine','Jus'],
+      es: ['Mermelada','Miel','Galletas','Refresco','Pan','Chocolate','Jabón','Paté','Terrina','Zumo']
+    };
+
+    const lang = langNow();
+
     for(let i=0;i<n;i++){
       const type = Math.random() < 0.55 ? 'weight' : 'unit';
       if(type==='weight'){
-        // price/kg from 7.90 to 39.90
         const pricePerKgC = randInt(790, 3990);
-        // grams: 80g to 650g
         const grams = randInt(80, 650);
-        // amount = price/kg * grams / 1000 => cents
         const amountC = Math.round(pricePerKgC * grams / 1000);
-        const name = pick(['Fromage','Jambon','Olives','Amandes','Fruits secs','Saucisson','Bonbons','Thé','Café','Tomates']);
-        items.push({
-          name,
-          type,
-          pricePerKgC,
-          grams,
-          amountC
-        });
+        const name = pick(namesWeight[lang] || namesWeight.fr);
+        items.push({ name, type, pricePerKgC, grams, amountC });
       } else {
         const priceC = randInt(120, 1290);
         const qty = randInt(1, (cfg.level>=4 ? 3 : 2));
-        const name = pick(['Confiture','Miel','Biscuit','Soda','Pain','Chocolat','Savon','Pâté','Terrine','Jus']);
-        items.push({
-          name,
-          type,
-          priceC,
-          qty,
-          amountC: priceC*qty
-        });
+        const amountC = priceC*qty;
+        const name = pick(namesUnit[lang] || namesUnit.fr);
+        items.push({ name, type, priceC, qty, amountC });
       }
     }
-    // total
+
     let total = items.reduce((s,it)=>s+it.amountC,0);
 
-    // adjust cents style depending level
-    // Make totals more "training-friendly" at low levels
     if(cfg.level === 1){
-      // force 0,10 or 0,20 or 0,50 endings
       const endings = [0,10,20,50,70,80,90];
       const want = pick(endings);
       total = total - (total%100) + want;
     } else if(cfg.level === 2){
-      // allow 0,05 & 0,95
       const endings = [0,5,10,15,20,25,30,40,50,60,70,75,80,90,95];
       const want = pick(endings);
       total = total - (total%100) + want;
     } else {
-      // allow full cents, optionally 1c/2c
       if(!cfg.allow1c2c){
-        // avoid 1-2 cents
         const c = total % 100;
-        if(c===1) total += 4; // -> 5
-        if(c===2) total += 3; // -> 5
-        if(c===3) total += 2; // -> 5
-        if(c===4) total += 1; // -> 5
-        if(c===6) total += 4; // -> 10
+        if(c===1) total += 4;
+        if(c===2) total += 3;
+        if(c===3) total += 2;
+        if(c===4) total += 1;
+        if(c===6) total += 4;
         if(c===7) total += 3;
         if(c===8) total += 2;
         if(c===9) total += 1;
       }
     }
 
-    // clamp max total
     if(total > cfg.maxTotalCents){
-      // scale down roughly
       const factor = cfg.maxTotalCents / total;
       total = Math.max(100, Math.floor(total * factor));
-      // keep reasonable cents
       total = total - (total%5);
     }
 
@@ -601,23 +685,18 @@
   }
 
   function generatePayment(totalCents, cfg){
-    // Choose paid >= total.
-    // Sometimes exact, often next 5/10/20/50, sometimes mixed payments.
     const choices = [];
-
-    // exact
     if(cfg.level>=2 && Math.random()<0.18) choices.push(totalCents);
 
-    // next euro, 5,10,20,50
     const totalEuro = Math.floor((totalCents + 99)/100);
     choices.push(totalEuro*100);
+
     const steps = [500,1000,2000,5000,10000];
     for(const s of steps){
       const paid = Math.ceil(totalCents / s) * s;
       choices.push(paid);
     }
 
-    // maybe 100€ at higher levels
     if(cfg.allowBigBills){
       choices.push(10000);
       choices.push(20000);
@@ -625,36 +704,33 @@
 
     let paidCents = pick(choices.filter(x=>x>=totalCents));
 
-    // ensure not too huge gap at low levels
     if(cfg.level<=2){
       paidCents = Math.min(paidCents, totalCents + 5000);
       if(paidCents < totalCents) paidCents = totalCents;
     }
 
-    // Mixed payments: create breakdown that sums to paidCents
     let breakdown = null;
     if(cfg.allowMixedPay && Math.random()<0.55){
       let rest = paidCents;
       breakdown = [];
-      // choose 2-4 pieces/bills
       const n = randInt(2, cfg.level>=4 ? 5 : 4);
+
       for(let i=0;i<n-1;i++){
-        // choose denom not exceeding rest-total? keep feasible
-        const max = rest - (i===n-2 ? 0 : 0);
-        const avail = DENOMS.filter(d => d<=max);
+        const avail = DENOMS.filter(d => d<=rest);
         const d = pick(avail);
         breakdown.push(d);
         rest -= d;
         if(rest<=0) break;
       }
-      if(rest>0) breakdown.push(rest); // last piece can be odd; acceptable in simulation
-      // Normalize: if last piece not a valid denom, convert by breaking into greedy denoms
-      if(!DENOMS.includes(rest)){
-        const extra = makeChangeBreakdown(rest).flatMap(([d,k]) => Array(k).fill(d));
+      if(rest>0) breakdown.push(rest);
+
+      const last = breakdown[breakdown.length-1];
+      if(!DENOMS.includes(last)){
         breakdown.pop();
+        const extra = makeChangeBreakdown(last).flatMap(([d,k]) => Array(k).fill(d));
         breakdown.push(...extra);
       }
-      // Shuffle
+
       breakdown.sort(()=>Math.random()-0.5);
     } else {
       breakdown = [paidCents];
@@ -664,53 +740,22 @@
   }
 
   function basketToText(basket){
+    const lang = langNow();
     const lines = basket.items.map(it => {
       if(it.type==='weight'){
         const p = (it.pricePerKgC/100).toFixed(2).replace('.', ',');
-        return `• ${it.name} (${it.grams} g à ${p} €/kg) = ${€(it.amountC)}`;
+        return lang === 'es'
+          ? `• ${it.name} (${it.grams} g a ${p} €/kg) = ${euroText(it.amountC)}`
+          : `• ${it.name} (${it.grams} g à ${p} €/kg) = ${euroText(it.amountC)}`;
       }
       const p = (it.priceC/100).toFixed(2).replace('.', ',');
-      return `• ${it.name} (${it.qty} × ${p} €) = ${€(it.amountC)}`;
+      return `• ${it.name} (${it.qty} × ${p} €) = ${euroText(it.amountC)}`;
     });
-    lines.push(`\nTOTAL = ${€(basket.totalCents)}`);
+    lines.push(`\nTOTAL = ${euroText(basket.totalCents)}`);
     return lines.join('\n');
   }
 
-  function newCase(){
-    const cfg = levelConfig(state.level);
-    const basket = generateBasket(cfg);
-    const pay = generatePayment(basket.totalCents, cfg);
-
-    const steps = countingUpSteps(basket.totalCents, pay.paidCents);
-    const changeCents = pay.paidCents - basket.totalCents;
-
-    // rounding (to next euro)
-    const nextEuro = Math.ceil(basket.totalCents/100)*100;
-    const askCents = nextEuro - basket.totalCents; // 0..99
-    const roundedChangeCents = pay.paidCents - nextEuro; // change if client adds askCents (and nextEuro <= paid)
-    // If nextEuro == basket.total, ask=0; still fine.
-
-    state.case = {
-      basket,
-      pay,
-      changeCents,
-      steps,
-      nextEuro,
-      askCents,
-      roundedChangeCents,
-      createdAt: now()
-    };
-    state.startTime = now();
-    renderCase();
-    setFeedback(null);
-    document.getElementById('answerInput').value = '';
-    document.getElementById('askInput').value = '';
-    document.getElementById('answerInput').focus();
-  }
-
-  // ---------- UI bindings ----------
-  const el = (id)=>document.getElementById(id);
-
+  // ---------- UI ----------
   function setFeedback(obj){
     const fb = el('feedback');
     if(!obj){
@@ -724,74 +769,11 @@
     fb.className = 'result ' + (obj.kind||'');
   }
 
-  function renderCase(){
-    const c = state.case;
-    el('totalDisplay').textContent = €(c.basket.totalCents);
-    el('paidDisplay').textContent = €(c.pay.paidCents);
-
-    const cfg = levelConfig(state.level);
-    el('caseMeta').textContent = `Mode niveau ${cfg.level} · ${c.basket.items.length} article(s)`;
-    el('paidBreakdown').textContent = `Détail: ${breakdownToString(makeChangeBreakdown(c.pay.paidCents))} (ou combo client)`;
-
-    // details
-    const d = el('detailsBlock');
-    d.textContent = basketToText(c.basket);
-    d.style.display = state.showDetails ? 'block' : 'none';
-
-    // hints
-    const h = el('hintBlock');
-    const stepLines = c.steps.map(s => `- ${€(s.from)} → ${€(s.to)} : +${€(s.add)}`).join('\n');
-    const chg = makeChangeBreakdown(c.changeCents);
-    h.innerHTML = `
-      <div style="font-weight:800;margin-bottom:6px">Aide “compléter jusqu’à”</div>
-      <div class="monoSmall" style="margin-bottom:8px">${stepLines || '(exact, rien à rendre)'}</div>
-      <div style="margin-top:6px"><b>Monnaie totale:</b> ${€(c.changeCents)} · <span class="monoSmall">Suggestion pièces/billets: ${breakdownToString(chg)}</span></div>
-      <div style="margin-top:8px"><b>Arrondi (option):</b> vers ${€(c.nextEuro)} → demander ${€(c.askCents)} · puis rendre ${Math.floor(c.roundedChangeCents/100)} € (si possible)</div>
-    `;
-    h.style.display = state.showHints ? 'block' : 'none';
-
-    // quick phrases chips
-    const qp = el('quickPhrases');
-    qp.innerHTML = '';
-    const ask = c.askCents;
-    const roundedChange = c.roundedChangeCents;
-    const chips = [];
-    if(ask>0){
-      chips.push(`Si vous avez ${ (ask/100).toFixed(2).replace('.',',') } €, je vous rends ${Math.floor(roundedChange/100)} € tout rond.`);
-      chips.push(`Vous auriez ${ (ask/100).toFixed(2).replace('.',',') } € ? Comme ça je vous rends ${Math.floor(roundedChange/100)} €.`);
-    } else {
-      chips.push(`Parfait, c’est rond: je vous rends ${ (c.changeCents/100).toFixed(2).replace('.',',') } €.`);
-    }
-    // Spanish quick lines (helpful in shop)
-    if(ask>0){
-      chips.push(`(ES) ¿Tienes ${ (ask/100).toFixed(2).replace('.',',') } €? Así te devuelvo ${Math.floor(roundedChange/100)} €.`);
-    } else {
-      chips.push(`(ES) Perfecto, te devuelvo ${ (c.changeCents/100).toFixed(2).replace('.',',') } €.`);
-    }
-    for(const t of chips){
-      const div = document.createElement('div');
-      div.className='chip';
-      div.textContent = t;
-      div.title = 'Clique pour copier dans le champ (ou juste pour t’entraîner)';
-      div.addEventListener('click', () => {
-        // if chip contains a number for ask, fill askInput
-        const m = t.match(/(\d+[,\.]\d{2})/);
-        if(m && ask>0){
-          el('askInput').value = m[1].replace('.',',');
-        }
-      });
-      qp.appendChild(div);
-    }
-
-    el('levelLabel').textContent = state.level.toString();
-    renderStats();
-  }
-
   function renderStats(){
     const s = state.stats;
-    el('solved').textContent = s.solved.toString();
-    el('mistakes').textContent = s.mistakes.toString();
-    el('streak').textContent = s.streak.toString();
+    el('solved').textContent = String(s.solved);
+    el('mistakes').textContent = String(s.mistakes);
+    el('streak').textContent = String(s.streak);
 
     const acc = s.solved ? Math.round((s.correct/s.solved)*100) : 0;
     el('acc').textContent = `${acc}%`;
@@ -804,7 +786,6 @@
       el('avgTime').textContent = '--';
     }
 
-    // history
     const ul = el('history');
     ul.innerHTML = '';
     for(const h of s.history.slice(0,10)){
@@ -820,7 +801,110 @@
     }
   }
 
-  // ---------- Validation logic ----------
+  function renderCase(){
+    const c = state.case;
+
+    el('totalDisplay').textContent = euroText(c.basket.totalCents);
+    el('paidDisplay').textContent = euroText(c.pay.paidCents);
+
+    const cfg = levelConfig(state.level);
+    const lang = langNow();
+    el('caseMeta').textContent =
+      `Mode niveau ${cfg.level} · ${c.basket.items.length} article(s)` + (lang === 'es' ? ' · Client ES 🇪🇸' : ' · Client FR 🇫🇷');
+
+    // ici on affiche le vrai "combo client" s'il existe
+    el('paidBreakdown').textContent = `Détail: ${denomListToString(c.pay.breakdown)}`;
+
+    const d = el('detailsBlock');
+    d.textContent = basketToText(c.basket);
+    d.style.display = state.showDetails ? 'block' : 'none';
+
+    const h = el('hintBlock');
+    const stepLines = c.steps.map(s => `- ${euroText(s.from)} → ${euroText(s.to)} : +${euroText(s.add)}`).join('\n');
+    const chg = makeChangeBreakdown(c.changeCents);
+    h.innerHTML = `
+      <div style="font-weight:900;margin-bottom:6px">Aide “compléter jusqu’à”</div>
+      <div class="monoSmall" style="margin-bottom:8px">${stepLines || '(exact, rien à rendre)'}</div>
+      <div style="margin-top:6px"><b>Monnaie totale:</b> ${euroText(c.changeCents)} · <span class="monoSmall">Suggestion: ${breakdownToString(chg)}</span></div>
+      <div style="margin-top:8px"><b>Arrondi (option):</b> vers ${euroText(c.nextEuro)} → demander ${euroText(c.askCents)} · puis rendre ${Math.floor(c.roundedChangeCents/100)} €</div>
+    `;
+    h.style.display = state.showHints ? 'block' : 'none';
+
+    // quick phrases chips (FR/ES)
+    const L = PHRASES[lang] || PHRASES.fr;
+    const qp = el('quickPhrases');
+    qp.innerHTML = '';
+
+    const ask = c.askCents;
+    const roundedChange = c.roundedChangeCents;
+    const x = (ask/100).toFixed(2).replace('.', ',');
+    const y = Math.floor(roundedChange/100).toString();
+
+    const chips = [];
+    chips.push(`${L.greet} · ${L.pay}`);
+
+    if(ask > 0){
+      chips.push(L.roundingAsk(x));
+      chips.push(L.roundingAsk2(x, y));
+    } else {
+      const chgTxt = (c.changeCents/100).toFixed(2).replace('.', ',');
+      chips.push(L.exact(chgTxt));
+    }
+    chips.push(L.thanks);
+
+    for(const t of chips){
+      const div = document.createElement('div');
+      div.className='chip';
+      div.textContent = t;
+      div.title = 'Clique pour pré-remplir le montant à demander (arrondi)';
+      div.addEventListener('click', () => {
+        if(ask>0) el('askInput').value = x;
+      });
+      qp.appendChild(div);
+    }
+
+    el('levelLabel').textContent = String(state.level);
+    el('toggleDetails').textContent = state.showDetails ? 'Masquer détails' : 'Afficher détails';
+    el('toggleHints').textContent = state.showHints ? 'Aide ON' : 'Aide OFF';
+
+    renderStats();
+  }
+
+  // ---------- New case ----------
+  function newCase(){
+    const cfg = levelConfig(state.level);
+    const basket = generateBasket(cfg);
+    const pay = generatePayment(basket.totalCents, cfg);
+
+    const steps = countingUpSteps(basket.totalCents, pay.paidCents);
+    const changeCents = pay.paidCents - basket.totalCents;
+
+    const nextEuro = Math.ceil(basket.totalCents/100)*100;
+    const askCents = nextEuro - basket.totalCents;
+    const roundedChangeCents = pay.paidCents - nextEuro;
+
+    state.case = {
+      basket,
+      pay,
+      changeCents,
+      steps,
+      nextEuro,
+      askCents,
+      roundedChangeCents,
+      createdAt: now()
+    };
+    state.startTime = now();
+
+    el('answerInput').value = '';
+    el('askInput').value = '';
+    setFeedback(null);
+    renderCase();
+
+    // focus sans scroll violent
+    try { el('answerInput').focus({preventScroll:true}); } catch { el('answerInput').focus(); }
+  }
+
+  // ---------- Validation ----------
   function checkAnswer({showCorrection=false, panic=false} = {}){
     const c = state.case;
     const roundingMode = el('roundingMode').value;
@@ -833,7 +917,6 @@
       return;
     }
 
-    // Determine expected based on rounding choice
     const canRound = c.askCents>0 && c.nextEuro<=c.pay.paidCents;
     let expectedChange = c.changeCents;
     let expectedAsk = null;
@@ -841,7 +924,6 @@
     if(roundingMode==='off'){
       expectedChange = c.changeCents;
     } else {
-      // If user filled askInput, interpret as they propose rounding
       const userProposes = askCentsInput!==null && askCentsInput>0;
       const shouldPropose = roundingMode==='must';
 
@@ -849,41 +931,37 @@
         expectedAsk = c.askCents;
         expectedChange = c.roundedChangeCents;
       } else if(shouldPropose && canRound){
-        expectedAsk = c.askCents; // required
+        expectedAsk = c.askCents;
         expectedChange = c.roundedChangeCents;
       } else {
-        expectedChange = c.changeCents; // not proposing: normal
+        expectedChange = c.changeCents;
       }
     }
 
     const okChange = ansCents === expectedChange;
-
     let okAsk = true;
+
     if(expectedAsk!==null){
       okAsk = (askCentsInput === expectedAsk);
-    } else {
-      if(roundingMode==='must' && canRound){
-        okAsk = false; // they should have asked but didn't
-      }
+    } else if(roundingMode==='must' && canRound){
+      okAsk = false;
     }
 
     const ok = okChange && okAsk;
-
-    // timing
     const t = now() - state.startTime;
 
     if(showCorrection || panic){
-      const steps = c.steps.map(s=>`• ${€(s.from)} → ${€(s.to)} : +${€(s.add)}`).join('\n');
+      const steps = c.steps.map(s=>`• ${euroText(s.from)} → ${euroText(s.to)} : +${euroText(s.add)}`).join('\n');
       const changeBreak = breakdownToString(makeChangeBreakdown(c.changeCents));
       const roundedBreak = breakdownToString(makeChangeBreakdown(c.roundedChangeCents));
       const corrLines = [];
       corrLines.push(`Correction (méthode “compléter”):`);
       corrLines.push(steps || '• Exact: rien à rendre');
-      corrLines.push(`\nMonnaie à rendre (sans arrondi): ${€(c.changeCents)} (${changeBreak})`);
+      corrLines.push(`\nMonnaie à rendre (sans arrondi): ${euroText(c.changeCents)} (${changeBreak})`);
       if(c.askCents>0 && c.nextEuro<=c.pay.paidCents){
-        corrLines.push(`Arrondi possible: demander ${€(c.askCents)} pour arriver à ${€(c.nextEuro)}.`);
-        corrLines.push(`Puis rendre ${Math.floor(c.roundedChangeCents/100)} € (soit ${€(c.roundedChangeCents)} ; ${roundedBreak}).`);
-        corrLines.push(`Phrase type: ${formatAskPhrase(c.askCents, c.roundedChangeCents)}`);
+        corrLines.push(`Arrondi possible: demander ${euroText(c.askCents)} pour arriver à ${euroText(c.nextEuro)}.`);
+        corrLines.push(`Puis rendre ${Math.floor(c.roundedChangeCents/100)} € (soit ${euroText(c.roundedChangeCents)} ; ${roundedBreak}).`);
+        corrLines.push(`Phrase type: ${formatAskPhraseFR(c.askCents, c.roundedChangeCents)}`);
       } else {
         corrLines.push(`Arrondi: inutile/impossible sur ce cas.`);
       }
@@ -891,7 +969,6 @@
       return;
     }
 
-    // update stats
     state.stats.solved += 1;
     if(ok){
       state.stats.correct += 1;
@@ -903,21 +980,19 @@
       state.stats.streak = 0;
     }
 
-    // history note
     const noteParts = [];
     if(roundingMode!=='off'){
-      if(canRound){
-        noteParts.push(`Arrondi: demander ${€(c.askCents)} → rendre ${Math.floor(c.roundedChangeCents/100)}€`);
-      } else {
-        noteParts.push('Arrondi: non pertinent');
-      }
+      noteParts.push(canRound
+        ? `Arrondi: demander ${euroText(c.askCents)} → rendre ${Math.floor(c.roundedChangeCents/100)}€`
+        : 'Arrondi: non pertinent');
     }
-    noteParts.push(`Attendu: ${€(expectedChange)}`);
-    if(expectedAsk!==null) noteParts.push(`Ask: ${€(expectedAsk)}`);
+    noteParts.push(`Attendu: ${euroText(expectedChange)}`);
+    if(expectedAsk!==null) noteParts.push(`Ask: ${euroText(expectedAsk)}`);
+
     state.stats.history.unshift({
       ts: new Date().toISOString(),
-      total: €(c.basket.totalCents),
-      paid: €(c.pay.paidCents),
+      total: euroText(c.basket.totalCents),
+      paid: euroText(c.pay.paidCents),
       ok,
       note: noteParts.join(' · ')
     });
@@ -928,14 +1003,13 @@
 
     if(ok){
       setFeedback({kind:'good', text:`✅ Juste. Temps: ${(t/1000).toFixed(1)}s\nProchain client prêt.`});
-      // auto new case after short pause
       setTimeout(newCase, 350);
     } else {
       let msg = `❌ Pas bon.\n`;
       if(!okAsk){
-        msg += `Arrondi: attendu “demander ${€(c.askCents)}” (et rendre ${Math.floor(c.roundedChangeCents/100)} €).\n`;
+        msg += `Arrondi: attendu “demander ${euroText(c.askCents)}” (et rendre ${Math.floor(c.roundedChangeCents/100)} €).\n`;
       }
-      msg += `Attendu: ${€(expectedChange)}.\n`;
+      msg += `Attendu: ${euroText(expectedChange)}.\n`;
       msg += `Clique “Voir correction” pour la marche “compléter”.`;
       setFeedback({kind:'bad', text: msg});
     }
@@ -956,77 +1030,72 @@
     state.timerInt = setInterval(tick, 250);
   }
 
-  // ---------- Controls ----------
-  el('newCase').addEventListener('click', newCase);
-  el('check').addEventListener('click', () => checkAnswer());
-  el('showSolution').addEventListener('click', () => checkAnswer({showCorrection:true}));
-  el('panic').addEventListener('click', () => checkAnswer({panic:true}));
+  // ---------- Events ----------
+  function bind(){
+    el('newCase').addEventListener('click', newCase);
+    el('check').addEventListener('click', () => checkAnswer());
+    el('showSolution').addEventListener('click', () => checkAnswer({showCorrection:true}));
+    el('panic').addEventListener('click', () => checkAnswer({panic:true}));
 
-  el('toggleHints').addEventListener('click', () => {
-    state.showHints = !state.showHints;
-    el('toggleHints').textContent = state.showHints ? 'Aide ON' : 'Aide OFF';
-    renderCase();
-  });
-
-  el('toggleDetails').addEventListener('click', () => {
-    state.showDetails = !state.showDetails;
-    el('toggleDetails').textContent = state.showDetails ? 'Afficher détails' : 'Masquer détails';
-    renderCase();
-  });
-
-  el('levelUp').addEventListener('click', () => {
-    state.level = clamp(state.level+1, 1, 5);
-    newCase();
-  });
-  el('levelDown').addEventListener('click', () => {
-    state.level = clamp(state.level-1, 1, 5);
-    newCase();
-  });
-
-  el('resetStats').addEventListener('click', () => {
-    if(confirm('Réinitialiser les statistiques locales ?')){
-      localStorage.removeItem(LS_KEY);
-      state.stats = loadStats();
-      renderStats();
-      setFeedback({kind:'warn', text:'Stats réinitialisées.'});
-    }
-  });
-
-  el('exportStats').addEventListener('click', () => {
-    const data = JSON.stringify({level: state.level, stats: state.stats}, null, 2);
-    navigator.clipboard?.writeText(data).then(() => {
-      setFeedback({kind:'good', text:'Stats copiées dans le presse-papiers (JSON).'});
-    }).catch(() => {
-      setFeedback({kind:'warn', text:'Impossible de copier automatiquement. Sélectionne le texte dans la console.'});
-      console.log(data);
-    });
-  });
-
-  // Keyboard shortcuts
-  window.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter'){
-      // avoid Enter when focusing select
-      const tag = (document.activeElement?.tagName || '').toLowerCase();
-      if(tag !== 'select') checkAnswer();
-    }
-    if(e.key.toLowerCase() === 'n') newCase();
-    if(e.key.toLowerCase() === 'h'){
+    el('toggleHints').addEventListener('click', () => {
       state.showHints = !state.showHints;
-      el('toggleHints').textContent = state.showHints ? 'Aide ON' : 'Aide OFF';
       renderCase();
-    }
-  });
+    });
+
+    el('toggleDetails').addEventListener('click', () => {
+      state.showDetails = !state.showDetails;
+      renderCase();
+    });
+
+    el('levelUp').addEventListener('click', () => {
+      state.level = clamp(state.level+1, 1, 5);
+      newCase();
+    });
+
+    el('levelDown').addEventListener('click', () => {
+      state.level = clamp(state.level-1, 1, 5);
+      newCase();
+    });
+
+    el('resetStats').addEventListener('click', () => {
+      if(confirm('Réinitialiser les statistiques locales ?')){
+        localStorage.removeItem(LS_KEY);
+        state.stats = loadStats();
+        renderStats();
+        setFeedback({kind:'warn', text:'Stats réinitialisées.'});
+      }
+    });
+
+    el('exportStats').addEventListener('click', async () => {
+      const data = JSON.stringify({level: state.level, stats: state.stats}, null, 2);
+      try{
+        await navigator.clipboard.writeText(data);
+        setFeedback({kind:'good', text:'Stats copiées dans le presse-papiers (JSON).'});
+      } catch(e){
+        setFeedback({kind:'warn', text:'Copie auto impossible. (Regarde la console)'}); 
+        console.log(data);
+      }
+    });
+
+    el('customerLang').addEventListener('change', () => newCase());
+
+    window.addEventListener('keydown', (e) => {
+      if(e.key === 'Enter'){
+        const tag = (document.activeElement?.tagName || '').toLowerCase();
+        if(tag !== 'select') checkAnswer();
+      }
+      if(e.key.toLowerCase() === 'n') newCase();
+      if(e.key.toLowerCase() === 'h'){
+        state.showHints = !state.showHints;
+        renderCase();
+      }
+    });
+  }
 
   // ---------- Boot ----------
   function boot(){
     state.stats = loadStats();
-    // init ui defaults
-    el('toggleHints').textContent = DEFAULTS.showHints ? 'Aide ON' : 'Aide OFF';
-    el('toggleDetails').textContent = DEFAULTS.showDetails ? 'Afficher détails' : 'Masquer détails';
-    state.showHints = DEFAULTS.showHints;
-    state.showDetails = DEFAULTS.showDetails;
-    state.level = DEFAULTS.level;
-    renderStats();
+    bind();
     startTimer();
     newCase();
   }
