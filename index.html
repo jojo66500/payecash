@@ -2,8 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>PayéCash · Simulateur Caisse Espèces</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PayéCash · Caisse Réaliste (Catalogue + Poids + Arrondi)</title>
   <style>
     :root{
       --bg:#0b1020;
@@ -19,33 +19,24 @@
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
     }
-
-    *{ box-sizing:border-box; }
-    html, body{ height:100%; }
-
+    *{box-sizing:border-box}
     body{
       margin:0;
       font-family:var(--sans);
-      background:
-        radial-gradient(1100px 700px at 20% 10%, rgba(124,247,212,.14), transparent 55%),
-        radial-gradient(900px 600px at 90% 30%, rgba(138,162,255,.14), transparent 55%),
-        var(--bg);
+      background: radial-gradient(1100px 700px at 20% 10%, rgba(124,247,212,.14), transparent 55%),
+                  radial-gradient(900px 600px at 90% 30%, rgba(138,162,255,.14), transparent 55%),
+                  var(--bg);
       color:var(--txt);
       min-height:100vh;
-      padding-bottom: env(safe-area-inset-bottom);
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
-
     header{
       padding:18px 18px 10px;
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
     }
-
     h1{
       margin:0;
       font-size:18px;
@@ -53,7 +44,6 @@
       display:flex;
       gap:10px;
       align-items:center;
-      flex-wrap:wrap;
     }
     h1 .pill{
       font-size:12px;
@@ -61,28 +51,26 @@
       background:var(--accent);
       padding:5px 10px;
       border-radius:999px;
-      font-weight:800;
-      white-space:nowrap;
+      font-weight:950;
     }
-
     .wrap{
-      max-width:1100px;
+      max-width:1220px;
       margin:0 auto;
       padding: 0 18px 22px;
       display:grid;
-      grid-template-columns: 1.3fr .9fr;
+      grid-template-columns: 1.42fr .78fr;
       gap:16px;
     }
-
+    @media (max-width: 980px){
+      .wrap{grid-template-columns:1fr}
+    }
     .card{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
       border-radius: var(--radius);
       overflow:hidden;
-      min-width:0;
     }
-
     .card .head{
       padding:14px 14px 10px;
       border-bottom:1px solid var(--line);
@@ -92,46 +80,26 @@
       gap:10px;
       flex-wrap:wrap;
     }
-
     .card .head h2{
       margin:0;
       font-size:14px;
       color:var(--muted);
-      font-weight:800;
+      font-weight:950;
       letter-spacing:.25px;
       text-transform:uppercase;
     }
-
     .card .body{ padding:14px; }
 
-    .grid2{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      min-width:0;
-    }
-
-    .row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      min-width:0;
-    }
-
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
     .mono{ font-family:var(--mono); }
+    .muted{ color:var(--muted); }
     .big{
       font-size:30px;
-      font-weight:900;
+      font-weight:980;
       letter-spacing:.2px;
-      word-break: break-word;
     }
-    .muted{ color:var(--muted); }
-
     .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      display:inline-flex; align-items:center; gap:8px;
       padding:6px 10px;
       border-radius:999px;
       background: rgba(255,255,255,.06);
@@ -139,10 +107,7 @@
       font-size:12px;
       color:var(--muted);
       user-select:none;
-      white-space:nowrap;
-      max-width:100%;
     }
-
     .btn{
       cursor:pointer;
       border:1px solid var(--line);
@@ -150,10 +115,9 @@
       color:var(--txt);
       padding:10px 12px;
       border-radius: 12px;
-      font-weight:800;
+      font-weight:950;
       transition: transform .05s ease, background .15s ease, border-color .15s ease;
       user-select:none;
-      touch-action: manipulation;
     }
     .btn:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.20); }
     .btn:active{ transform: translateY(1px); }
@@ -174,13 +138,32 @@
       padding:10px 12px;
       border-radius: 12px;
       outline:none;
-      min-width:0;
-      font-size:16px; /* évite zoom iOS */
     }
     input:focus, select:focus{
       border-color: rgba(124,247,212,.45);
       box-shadow: 0 0 0 3px rgba(124,247,212,.14);
     }
+
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width: 600px){ .grid2{grid-template-columns:1fr} }
+    .sep{ height:1px; background: var(--line); margin:12px 0; }
+
+    .hint, .result{
+      padding:10px 12px;
+      border-radius: 14px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      font-size:13px;
+      line-height:1.45;
+      white-space: pre-wrap;
+    }
+    .hint{
+      border:1px dashed rgba(124,247,212,.35);
+      background: rgba(124,247,212,.08);
+    }
+    .good{ border-color: rgba(78,224,122,.35); background: rgba(78,224,122,.08); }
+    .bad{ border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.08); }
+    .warn{ border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.08); }
 
     .kpi{
       display:grid;
@@ -192,57 +175,78 @@
       border-radius: 14px;
       border:1px solid var(--line);
       background: rgba(255,255,255,.04);
-      min-width:0;
     }
     .kpi .box .t{ font-size:12px; color:var(--muted); }
-    .kpi .box .v{ font-size:18px; font-weight:900; margin-top:4px; }
+    .kpi .box .v{ font-size:18px; font-weight:980; margin-top:4px; }
 
-    .list{
-      margin:10px 0 0;
-      padding:0;
-      list-style:none;
+    .tabs{ display:flex; gap:8px; flex-wrap:wrap; }
+    .tab{
+      cursor:pointer;
+      padding:8px 10px;
+      border-radius: 999px;
       border:1px solid var(--line);
-      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      color: var(--muted);
+      font-weight:950;
+      font-size:12px;
+      user-select:none;
+    }
+    .tab.active{
+      color: var(--bg);
+      background: var(--accent);
+      border-color: rgba(124,247,212,.55);
+    }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
       overflow:hidden;
-    }
-    .list li{
-      padding:10px 12px;
-      border-bottom:1px solid var(--line);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      background: rgba(255,255,255,.03);
-      min-width:0;
-    }
-    .list li:last-child{ border-bottom:none; }
-
-    .sep{ height:1px; background: var(--line); margin:12px 0; }
-
-    .hint{
-      padding:10px 12px;
-      border-radius: 14px;
-      border:1px dashed rgba(124,247,212,.35);
-      background: rgba(124,247,212,.08);
-      color: var(--txt);
-      font-size:13px;
-      line-height:1.35;
-      overflow-wrap:anywhere;
-    }
-
-    .result{
-      padding:10px 12px;
-      border-radius: 14px;
+      border-radius:14px;
       border:1px solid var(--line);
-      background: rgba(255,255,255,.04);
-      font-size:13px;
-      line-height:1.45;
-      white-space: pre-wrap;
-      overflow-wrap:anywhere;
+      background: rgba(255,255,255,.03);
     }
-    .good{ border-color: rgba(78,224,122,.35); background: rgba(78,224,122,.08); }
-    .bad{ border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.08); }
-    .warn{ border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.08); }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      vertical-align:middle;
+      font-size:13px;
+    }
+    th{
+      text-align:left;
+      font-size:12px;
+      color: var(--muted);
+      letter-spacing:.15px;
+      text-transform:uppercase;
+      font-weight:980;
+      background: rgba(255,255,255,.03);
+    }
+    tr:last-child td{ border-bottom:none; }
+    .cell-mini{ width:140px; }
+    .cell-mid{ width:190px; }
+    .cell-actions{ width:92px; text-align:right; }
 
+    .note{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+      margin-top:6px;
+    }
+    footer{
+      max-width:1220px;
+      margin:0 auto;
+      padding: 0 18px 24px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .kbd{
+      font-family:var(--mono);
+      font-size:12px;
+      padding:2px 6px;
+      border-radius:8px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.2);
+      color: var(--txt);
+    }
     .chips{ display:flex; gap:8px; flex-wrap:wrap; }
     .chip{
       border:1px solid var(--line);
@@ -253,94 +257,55 @@
       color:var(--muted);
       cursor:pointer;
       user-select:none;
-      max-width:100%;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
     }
     .chip:hover{ background: rgba(255,255,255,.10); }
-
     .monoSmall{ font-family:var(--mono); font-size:12px; color:var(--muted); }
-    .note{ font-size:12px; color:var(--muted); margin-top:6px; line-height:1.35; }
-
-    footer{
-      max-width:1100px;
-      margin: 0 auto;
-      padding: 0 18px 24px;
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .kbd{
-      font-family:var(--mono);
-      font-size:12px;
-      padding:2px 6px;
-      border-radius:8px;
-      border:1px solid var(--line);
-      background: rgba(0,0,0,.2);
-      color: var(--txt);
-      display:inline-block;
-    }
-
-    @media (max-width: 980px){
-      .wrap{ grid-template-columns:1fr; }
-    }
-
-    @media (max-width: 560px){
-      header{ padding:14px 12px 8px; }
-      .wrap{ padding: 0 12px 18px; gap:12px; }
-      .card .body{ padding:12px; }
-      .card .head{ padding:12px 12px 8px; }
-      .grid2{ grid-template-columns:1fr; }
-      .big{ font-size:26px; }
-
-      /* boutons de la zone "actions" en colonne */
-      .actions .btn{ width:100%; justify-content:center; }
-
-      /* les petits boutons (header) restent compacts */
-      .btn.small{ width:auto; }
-    }
-
-    @media (max-width: 380px){
-      .big{ font-size:24px; }
-      h1{ font-size:16px; }
-      h1 .pill{ font-size:11px; }
-    }
+    .checklist label{ display:flex; gap:10px; align-items:flex-start; padding:8px 10px; border:1px solid var(--line); border-radius:14px; background: rgba(255,255,255,.04); }
+    .checklist input[type="checkbox"]{ margin-top:3px; }
   </style>
 </head>
 
 <body>
-  <header>
-    <h1>🪙 PayéCash <span class="pill">simulateur caisse</span></h1>
-    <div class="row">
-      <span class="badge">⏱️ <span id="timer">00:00</span></span>
-      <span class="badge">🎯 Série <span id="streak">0</span></span>
-      <span class="badge">📈 Niveau <span id="levelLabel">1</span></span>
+<header>
+  <h1>🪙 PayéCash <span class="pill">catalogue + poids + arrondi</span></h1>
+  <div class="row">
+    <span class="badge">⏱️ <span id="timer">00:00</span></span>
+    <span class="badge">🎯 Série <span id="streak">0</span></span>
+    <span class="badge">📈 Niveau <span id="levelLabel">3</span></span>
 
-      <span class="badge">
-        🧑‍💼 Client
-        <select id="customerLang" style="width:auto; padding:6px 10px; border-radius:10px; font-size:14px">
-          <option value="fr">FR</option>
-          <option value="es">ES</option>
-        </select>
-      </span>
+    <span class="badge">
+      🧑‍💼 Client
+      <select id="customerLang" style="width:auto; padding:6px 10px; border-radius:10px">
+        <option value="fr">FR</option>
+        <option value="es">ES</option>
+      </select>
+    </span>
 
-      <button class="btn small ghost" id="resetStats">Réinitialiser stats</button>
-    </div>
-  </header>
+    <button class="btn small ghost" id="resetStats">Réinitialiser stats</button>
+  </div>
+</header>
 
-  <div class="wrap">
-    <section class="card">
-      <div class="head">
-        <h2>Scénario client</h2>
-        <div class="row">
-          <button class="btn small" id="newCase">Nouveau client</button>
-          <button class="btn small" id="toggleDetails">Afficher détails</button>
-          <button class="btn small" id="toggleHints">Aide ON</button>
-        </div>
+<div class="wrap">
+  <!-- MAIN -->
+  <section class="card">
+    <div class="head">
+      <h2 id="mainTitle">Entraînement réaliste</h2>
+      <div class="tabs" role="tablist" aria-label="Modes">
+        <div class="tab active" id="tabTraining" role="tab" aria-selected="true">Entraînement</div>
+        <div class="tab" id="tabTill" role="tab" aria-selected="false">Vraie caisse</div>
+        <div class="tab" id="tabChecklist" role="tab" aria-selected="false">Checklist</div>
       </div>
+      <div class="row">
+        <button class="btn small" id="newCase">Nouveau client</button>
+        <button class="btn small" id="toggleDetails">Masquer détails</button>
+        <button class="btn small" id="toggleHints">Aide ON</button>
+      </div>
+    </div>
 
-      <div class="body">
+    <div class="body">
+
+      <!-- TRAINING -->
+      <div id="trainingPanel">
         <div class="grid2">
           <div>
             <div class="muted">Total à payer</div>
@@ -363,114 +328,229 @@
 
         <div class="grid2">
           <div>
-            <label class="muted">Option: proposer un arrondi (à l’euro supérieur)</label>
+            <label class="muted">Arrondi</label>
             <select id="roundingMode">
               <option value="off">Désactivé</option>
-              <option value="suggest">Je propose (texte)</option>
-              <option value="must">Obligatoire (le jeu te note)</option>
+              <option value="suggest" selected>Je propose (optionnel)</option>
+              <option value="must">Obligatoire (noté)</option>
             </select>
 
-            <div style="margin-top:10px" class="chips" id="quickPhrases" aria-label="phrases rapides"></div>
-            <div class="note">Mode ES: phrases rapides en espagnol (clic = pré-remplit le montant à demander pour arrondir).</div>
+            <div class="sep"></div>
+
+            <div class="muted">Phrases rapides (FR/ES)</div>
+            <div style="margin-top:10px" class="chips" id="quickPhrases"></div>
+            <div class="note">Clique une phrase: ça pré-remplit “ce que tu demandes” quand c’est utile.</div>
           </div>
 
           <div>
             <label class="muted">Ta réponse: monnaie à rendre (€)</label>
             <input id="answerInput" inputmode="decimal" placeholder="Ex: 18,25" />
-
-            <div class="row actions" style="margin-top:10px">
+            <div class="row" style="margin-top:10px">
               <button class="btn primary" id="check">Valider</button>
               <button class="btn" id="showSolution">Voir correction</button>
               <button class="btn danger" id="panic">Je panique 😵</button>
             </div>
 
             <div style="margin-top:10px">
-              <label class="muted">Optionnel: ce que tu demandes au client pour arrondir (€)</label>
-              <input id="askInput" inputmode="decimal" placeholder="Ex: 0,25 (si tu proposes un arrondi)" />
-              <div class="note">Astuce: annonce toujours les 2: “Si vous avez X, je vous rends Y tout rond.”</div>
+              <label class="muted">Optionnel: ce que tu demandes pour arrondir (€)</label>
+              <input id="askInput" inputmode="decimal" placeholder="Ex: 0,25" />
+              <div class="note">Réflexe: “Si vous avez X, je vous rends Y.”</div>
             </div>
           </div>
         </div>
 
         <div class="sep"></div>
-
         <div id="feedback" class="result" style="display:none"></div>
       </div>
-    </section>
 
-    <aside class="card">
-      <div class="head">
-        <h2>Progression</h2>
-        <div class="row">
-          <button class="btn small" id="levelDown">−</button>
-          <button class="btn small" id="levelUp">+</button>
-        </div>
-      </div>
+      <!-- TILL -->
+      <div id="tillPanel" style="display:none">
 
-      <div class="body">
-        <div class="kpi">
-          <div class="box">
-            <div class="t">✅ Justesse</div>
-            <div class="v" id="acc">0%</div>
+        <div class="grid2">
+          <div>
+            <div class="muted">Ajout rapide depuis le catalogue (ton magasin)</div>
+            <div class="note">Recherche + ajout au poids ou à l’unité, promos incluses.</div>
           </div>
-          <div class="box">
-            <div class="t">⚡ Temps moyen</div>
-            <div class="v" id="avgTime">--</div>
-          </div>
-          <div class="box">
-            <div class="t">📦 Cas résolus</div>
-            <div class="v" id="solved">0</div>
-          </div>
-          <div class="box">
-            <div class="t">🧩 Erreurs</div>
-            <div class="v" id="mistakes">0</div>
+          <div>
+            <div class="muted">Paiement client</div>
+            <input id="tillPaidInput" inputmode="decimal" placeholder="Ex: 50,00" />
+            <div class="note">Tu peux écrire avec virgule.</div>
           </div>
         </div>
 
         <div class="sep"></div>
 
+        <div class="grid2">
+          <div>
+            <input id="catalogSearch" placeholder="Rechercher (ex: nougat, bière, muscat…)" />
+          </div>
+          <div class="row" style="justify-content:flex-end">
+            <select id="catalogSelect"></select>
+          </div>
+        </div>
+
+        <div class="grid2" style="margin-top:10px">
+          <div>
+            <div class="muted">Détails produit</div>
+            <div class="result" id="catalogInfo" style="min-height:64px"></div>
+          </div>
+          <div>
+            <div class="muted">Quantité</div>
+            <div class="grid2">
+              <input id="catalogQty" inputmode="decimal" placeholder="Qté (ex: 1, 2, 3…)" />
+              <input id="catalogGrams" inputmode="decimal" placeholder="Grammes (si au poids)" />
+            </div>
+            <div class="row" style="margin-top:10px">
+              <button class="btn primary" id="catalogAdd">Ajouter</button>
+              <button class="btn" id="applyDeal">Appliquer promo</button>
+            </div>
+            <div class="note" id="dealHint"></div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+
+        <table aria-label="Articles">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Libellé</th>
+              <th class="cell-mini">Prix</th>
+              <th class="cell-mini">Qté / g</th>
+              <th class="cell-mid">Total ligne</th>
+              <th class="cell-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="itemsBody"></tbody>
+        </table>
+
+        <div class="row" style="margin-top:10px; justify-content:space-between">
+          <div class="row">
+            <button class="btn small" id="addUnit">+ Unité</button>
+            <button class="btn small" id="addWeight">+ Poids</button>
+            <button class="btn small" id="addDirect">+ Montant</button>
+            <button class="btn small danger" id="clearItems">Tout effacer</button>
+          </div>
+          <div class="badge">Total: <span class="mono" id="tillTotal">0,00 €</span></div>
+        </div>
+
+        <div class="sep"></div>
+
+        <div class="grid2">
+          <div class="hint">
+            <div style="font-weight:980;margin-bottom:6px">Résultat caisse</div>
+            <div>Total: <span class="mono" id="tillTotal2">0,00 €</span></div>
+            <div>Payé: <span class="mono" id="tillPaid2">0,00 €</span></div>
+            <div style="margin-top:6px">Monnaie à rendre: <span class="mono" id="tillChange">0,00 €</span></div>
+            <div class="note" id="tillWarn" style="margin-top:8px"></div>
+            <div class="sep"></div>
+            <div class="monoSmall" id="tvaInfo">TVA: 20% uniquement alcool + nougat (aide-mémoire).</div>
+          </div>
+
+          <div class="hint" id="tillSuggestion">
+            <div style="font-weight:980;margin-bottom:6px">Suggestion d’arrondi (anti-pièces)</div>
+            <div id="tillSuggestionText" class="monoSmall">Ajoute des articles et un paiement pour voir une proposition.</div>
+            <div class="sep"></div>
+            <div class="muted">Phrases FR/ES (clic = copie l’appoint)</div>
+            <div style="margin-top:10px" class="chips" id="tillPhrases"></div>
+          </div>
+        </div>
+
+        <div class="sep"></div>
+        <div class="note">
+          “Panier compter 2€” + “Enveloppe du soir: date en haut, SPN au milieu, CA en bas” (notes patron).
+        </div>
+      </div>
+
+      <!-- CHECKLIST -->
+      <div id="checklistPanel" style="display:none">
         <div class="hint">
-          <div style="font-weight:900;margin-bottom:6px">Réflexe “compléter” (anti-retournage de cerveau)</div>
-          <div>Tu pars du <b>total</b> et tu montes vers le <b>payé</b> en marches:</div>
-          <ul style="margin:8px 0 0; padding-left:18px">
-            <li>centimes → <b>… ,00</b></li>
-            <li>puis paliers: <b>+1</b>, <b>+2</b>, <b>+5</b>, <b>+10</b>, <b>+20</b></li>
-          </ul>
-          <div style="margin-top:8px">Raccourcis vers l’euro rond:</div>
-          <div class="monoSmall">… ,75→+0,25 · … ,80→+0,20 · … ,90→+0,10 · … ,95→+0,05 · … ,98→+0,02 · … ,99→+0,01</div>
+          <div style="font-weight:980;margin-bottom:6px">Checklist (d’après les notes de ton patron)</div>
+          <div class="note">Tout est local (ça se coche et se garde sur ton téléphone).</div>
         </div>
 
         <div class="sep"></div>
 
-        <div class="row" style="justify-content:space-between">
-          <div class="muted">Historique (10 derniers)</div>
-          <button class="btn small" id="exportStats">Exporter JSON</button>
+        <div class="grid2">
+          <div class="checklist" id="checklistOpen">
+            <div class="muted" style="margin-bottom:8px">Ouverture / journée</div>
+          </div>
+          <div class="checklist" id="checklistClose">
+            <div class="muted" style="margin-bottom:8px">Fermeture / soir</div>
+          </div>
         </div>
 
-        <ul class="list" id="history"></ul>
-
         <div class="sep"></div>
-
-        <div class="muted">Raccourcis clavier</div>
-        <div class="monoSmall" style="margin-top:6px">
-          <span class="kbd">Entrée</span> valider · <span class="kbd">N</span> nouveau client · <span class="kbd">H</span> aide
+        <div class="row">
+          <button class="btn small" id="checkAll">Tout cocher</button>
+          <button class="btn small danger" id="uncheckAll">Tout décocher</button>
         </div>
       </div>
-    </aside>
-  </div>
+    </div>
+  </section>
 
-  <footer>
-    Conçu pour GitHub Pages: un seul fichier, stockage local (localStorage). Aucun serveur, aucune donnée envoyée.
-  </footer>
+  <!-- SIDE -->
+  <aside class="card">
+    <div class="head">
+      <h2>Progression</h2>
+      <div class="row">
+        <button class="btn small" id="levelDown">−</button>
+        <button class="btn small" id="levelUp">+</button>
+      </div>
+    </div>
+    <div class="body">
+      <div class="kpi">
+        <div class="box">
+          <div class="t">✅ Justesse</div>
+          <div class="v" id="acc">0%</div>
+        </div>
+        <div class="box">
+          <div class="t">⚡ Temps moyen</div>
+          <div class="v" id="avgTime">--</div>
+        </div>
+        <div class="box">
+          <div class="t">📦 Cas résolus</div>
+          <div class="v" id="solved">0</div>
+        </div>
+        <div class="box">
+          <div class="t">🧩 Erreurs</div>
+          <div class="v" id="mistakes">0</div>
+        </div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="hint">
+        <div style="font-weight:980;margin-bottom:6px">Méthode “compléter” (ultra fiable)</div>
+        <div class="monoSmall">31,75 → 32,00 (+0,25) → 40,00 (+8) → 50,00 (+10)</div>
+        <div class="note" style="margin-top:8px">Tu annonces “je vous rends…” et tu donnes billets puis pièces.</div>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="muted">Raccourcis clavier</div>
+      <div class="monoSmall" style="margin-top:6px">
+        <span class="kbd">Entrée</span> valider (training) · <span class="kbd">N</span> nouveau client · <span class="kbd">H</span> aide
+      </div>
+
+      <div class="sep"></div>
+      <button class="btn small ghost" id="exportStats">Exporter stats JSON</button>
+    </div>
+  </aside>
+</div>
+
+<footer>
+  1 fichier, 0 serveur. Catalogue basé sur tes notes (produits + prix + promos). Si tu veux, on peut ensuite ajouter un vrai “ticket imprimable” et un mode “sans total affiché”.
+</footer>
 
 <script>
 (() => {
-  // ---------- Utils ----------
-  const euroText = (cents) => (cents/100).toFixed(2).replace('.', ',') + ' €';
-  const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
-  const now = () => Date.now();
+  // ---------------- Utilities ----------------
+  const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+  const now = ()=>Date.now();
   const el = (id)=>document.getElementById(id);
-  const langNow = () => document.getElementById('customerLang')?.value || 'fr';
+
+  const euroText = (cents)=> (cents/100).toFixed(2).replace('.', ',') + ' €';
 
   function parseEurosToCents(str){
     if(!str) return null;
@@ -483,279 +563,421 @@
     return euros*100 + parseInt(cents,10);
   }
 
-  function formatAskPhraseFR(askCents, changeRoundedCents){
-    const ask = (askCents/100).toFixed(2).replace('.', ',');
-    const chg = Math.floor(changeRoundedCents/100).toString();
-    return `“Si vous avez ${ask} €, ça m’arrange, je vous rends ${chg} € tout rond.”`;
+  function centsToInput(cents){
+    return (cents/100).toFixed(2).replace('.',',');
   }
 
-  // ---------- Phrasebook (FR/ES) ----------
+  const langNow = ()=> el('customerLang')?.value || 'fr';
+
+  // ---------------- Phrases FR/ES ----------------
   const PHRASES = {
     fr: {
       greet: "Bonjour 🙂",
       pay: "Je paie en espèces.",
-      roundingAsk: (x) => `Vous auriez ${x} € ? Comme ça je vous rends tout rond.`,
-      roundingAsk2: (x,y) => `Si vous avez ${x} €, ça m’arrange, je vous rends ${y} € tout rond.`,
+      roundingAsk: (x) => `Vous auriez ${x} € ? Comme ça je vous rends plus simple.`,
+      roundingAsk2: (x,y) => `Si vous avez ${x} €, je vous rends ${y} € tout rond.`,
       exact: (chg) => `Parfait, je vous rends ${chg} €.`,
       thanks: "Merci, bonne journée !"
     },
     es: {
       greet: "Hola 🙂",
       pay: "Pago en efectivo.",
-      roundingAsk: (x) => `¿Tienes ${x} €? Así te devuelvo redondo.`,
-      roundingAsk2: (x,y) => `Si tienes ${x} €, mejor, así te devuelvo ${y} € justo.`,
+      roundingAsk: (x) => `¿Tienes ${x} €? Así te devuelvo más fácil.`,
+      roundingAsk2: (x,y) => `Si tienes ${x} €, te devuelvo ${y} € redondo.`,
       exact: (chg) => `Perfecto, te devuelvo ${chg} €.`,
       thanks: "¡Gracias, buen día!"
     }
   };
 
-  // ---------- Money system ----------
+  // ---------------- Catalogue (d'après tes notes) ----------------
+  // Types:
+  // - "weight": pricePerKgC + grams
+  // - "unit": priceC + qty
+  // Deals:
+  // - unitDeals: array { buy, payCents, note }
+  // - weightDeals: optional (not used here)
+  const CATALOG = [
+    // PÂTISSERIES AU POIDS
+    { id:"gateaux_patis", type:"weight", nameFR:"Gâteaux pâtissiers (rousquilles)", nameES:"Pasteles (rosquillas)", pricePerKgC:4000, vat20:false,
+      noteFR:"Prix au kilo 40€ (en sachet). Sauf cerise/abricot et rousquillettes: 45€/kg.", noteES:"40€/kg. Excepto cereza/albaricoque y 'rousquillettes': 45€/kg." },
+    { id:"gateaux_patis_special", type:"weight", nameFR:"Gâteaux pâtissiers (cerise/abricot/rousquillettes)", nameES:"Pasteles (cereza/albaricoque)", pricePerKgC:4500, vat20:false,
+      noteFR:"Exception à 45€/kg.", noteES:"Excepción: 45€/kg." },
+    { id:"gateau_broche", type:"weight", nameFR:"Gâteau à la broche", nameES:"Pastel a la broche", pricePerKgC:4490, vat20:false,
+      noteFR:"Prix au kilo 44,90€.", noteES:"44,90€/kg." },
+
+    // NOUGATS / TURRON / CHOCOLATS (au poids)
+    { id:"nougat", type:"weight", nameFR:"Nougat", nameES:"Turrón (nougat)", pricePerKgC:5900, vat20:true,
+      noteFR:"5,90€ les 100g (≈59€/kg).", noteES:"5,90€ / 100g (≈59€/kg)." },
+    { id:"nougat_cube", type:"weight", nameFR:"Nougat petit cube", nameES:"Turrón (cubitos)", pricePerKgC:5900, vat20:true,
+      noteFR:"5,90€ les 100g. Cornet 12 (les 2 à 20€). Dans un cornet: ~200g (note).", noteES:"5,90€/100g. Cono 12: 2 por 20€." },
+    { id:"turron", type:"weight", nameFR:"Turron (miel/amande)", nameES:"Turrón (miel/almendra)", pricePerKgC:5900, vat20:true,
+      noteFR:"5,90€ les 100g (≈59€/kg).", noteES:"5,90€/100g (≈59€/kg)." },
+    { id:"chocolats", type:"weight", nameFR:"Chocolats (cornet / 100g)", nameES:"Chocolates (100g)", pricePerKgC:5900, vat20:false,
+      noteFR:"5,90€ les 100g (≈59€/kg). Cornet 12: les 2 à 20€ (possible mix avec nougat).", noteES:"5,90€/100g. Cono 12: 2 por 20€." },
+
+    // UNITAIRES
+    { id:"gateaux_esat", type:"unit", nameFR:"Gâteaux de l’ESAT (paquet)", nameES:"Galletas ESAT (paquete)", priceC:690, vat20:false,
+      noteFR:"6,90€ le paquet. Offre: les 2 à 12€ au choix.", noteES:"6,90€ el paquete. Oferta: 2 por 12€." ,
+      unitDeals:[{buy:2, payCents:1200, noteFR:"2 pour 12€", noteES:"2 por 12€"}]
+    },
+    { id:"biere_petite", type:"unit", nameFR:"Bière (petite)", nameES:"Cerveza (pequeña)", priceC:450, vat20:true,
+      noteFR:"4,50€ pièce. Offre: 3 à 12€.", noteES:"4,50€ unidad. Oferta: 3 por 12€.",
+      unitDeals:[{buy:3, payCents:1200, noteFR:"3 pour 12€", noteES:"3 por 12€"}]
+    },
+    { id:"biere_grande", type:"unit", nameFR:"Bière (grande)", nameES:"Cerveza (grande)", priceC:1200, vat20:true,
+      noteFR:"12€ pièce. Offre: les 2 à 20€.", noteES:"12€ unidad. Oferta: 2 por 20€.",
+      unitDeals:[{buy:2, payCents:2000, noteFR:"2 pour 20€", noteES:"2 por 20€"}]
+    },
+    { id:"tapenade", type:"unit", nameFR:"Tapenade", nameES:"Tapenade", priceC:690, vat20:false,
+      noteFR:"6,90€ pièce. Offre: les 3 à 18€.", noteES:"6,90€ unidad. Oferta: 3 por 18€.",
+      unitDeals:[{buy:3, payCents:1800, noteFR:"3 pour 18€", noteES:"3 por 18€"}]
+    },
+    { id:"terrine", type:"unit", nameFR:"Terrine", nameES:"Terrina", priceC:450, vat20:false,
+      noteFR:"4,50€ pièce. Offre: les 3 à 12€.", noteES:"4,50€ unidad. Oferta: 3 por 12€.",
+      unitDeals:[{buy:3, payCents:1200, noteFR:"3 pour 12€", noteES:"3 por 12€"}]
+    },
+    { id:"miel", type:"unit", nameFR:"Miel (pot)", nameES:"Miel (tarro)", priceC:1200, vat20:false,
+      noteFR:"12€ le pot. Récolte française (Camélas).", noteES:"12€ el tarro." },
+    { id:"confiture", type:"unit", nameFR:"Confiture (pot)", nameES:"Mermelada (tarro)", priceC:690, vat20:false,
+      noteFR:"6,90€ le pot (BIO).", noteES:"6,90€ el tarro (BIO)." },
+
+    // VINS (seul prix noté clairement)
+    { id:"muscat", type:"unit", nameFR:"Muscat de Rivesaltes", nameES:"Moscatel de Rivesaltes", priceC:1500, vat20:true,
+      noteFR:"15€ pièce. Offre notée: les 2 à 25€ (mix possible).", noteES:"15€ unidad. Oferta: 2 por 25€ (mix posible).",
+      unitDeals:[{buy:2, payCents:2500, noteFR:"2 pour 25€", noteES:"2 por 25€"}]
+    },
+    // Petits plus
+    { id:"panier", type:"unit", nameFR:"Panier (compter)", nameES:"Cesta", priceC:200, vat20:false,
+      noteFR:"Panier compter 2€ (note patron).", noteES:"Cesta 2€." }
+  ];
+
+  function displayName(item){
+    return (langNow()==='es' ? item.nameES : item.nameFR) || item.nameFR;
+  }
+  function displayNote(item){
+    return (langNow()==='es' ? item.noteES : item.noteFR) || item.noteFR || '';
+  }
+  function dealsText(item){
+    if(!item.unitDeals || !item.unitDeals.length) return '';
+    const d = item.unitDeals[0];
+    return langNow()==='es' ? (d.noteES||'') : (d.noteFR||'');
+  }
+
+  // ---------------- Money / change ----------------
   const COINS = [200,100,50,20,10,5,2,1];
   const BILLS = [50000,20000,10000,5000,2000,1000,500];
   const DENOMS = [...BILLS, ...COINS];
 
-  function makeChangeBreakdown(amountCents){
+  function makeBreakdown(amountCents){
     let rest = amountCents;
     const out = [];
     for(const d of DENOMS){
-      if(rest <= 0) break;
-      const k = Math.floor(rest / d);
-      if(k>0){
-        out.push([d,k]);
-        rest -= d*k;
-      }
+      if(rest<=0) break;
+      const k = Math.floor(rest/d);
+      if(k>0){ out.push([d,k]); rest-=d*k; }
     }
     return out;
   }
-
   function breakdownToString(bd){
-    if(!bd || !bd.length) return '0';
-    return bd.map(([d,k]) => {
-      if(d>=100) return `${k}×${(d/100).toFixed(0)}€`;
-      return `${k}×${d}c`;
-    }).join(' + ');
+    if(!bd.length) return '0';
+    return bd.map(([d,k]) => d>=100 ? `${k}×${(d/100).toFixed(0)}€` : `${k}×${d}c`).join(' + ');
   }
-
-  function denomListToString(list){
-    if(!list || !list.length) return '0';
-    const counts = new Map();
-    for(const d of list) counts.set(d, (counts.get(d)||0)+1);
-    const ordered = Array.from(counts.entries()).sort((a,b)=>b[0]-a[0]);
-    return ordered.map(([d,k]) => d>=100 ? `${k}×${(d/100).toFixed(0)}€` : `${k}×${d}c`).join(' + ');
+  function countCoinsBills(amountCents){
+    const bd = makeBreakdown(amountCents);
+    let coins=0, bills=0;
+    for(const [d,k] of bd){
+      if(d>=500) bills+=k;
+      else coins+=k;
+    }
+    return {coins,bills,bd};
   }
 
   function countingUpSteps(totalCents, paidCents){
     let cur = totalCents;
     const steps = [];
-    const pushStep = (to) => {
+    const push = (to)=>{
       if(to>cur){
-        steps.push({from: cur, to, add: to-cur});
-        cur = to;
+        steps.push({from:cur,to,add:to-cur});
+        cur=to;
       }
     };
-
-    const mod = cur % 100;
-    if(mod !== 0) pushStep(cur + (100 - mod));
-
-    const niceEuroTargets = [5,10,20,50,100,200,500];
+    const mod = cur%100;
+    if(mod!==0) push(cur+(100-mod));
+    const nice = [5,10,20,50,100,200,500];
     while(cur < paidCents){
       const curEuro = Math.floor(cur/100);
       const candidates = [];
       candidates.push((curEuro+1)*100);
-      for(const t of niceEuroTargets){
-        const next = (Math.floor(curEuro / t) + 1)*t*100;
+      for(const t of nice){
+        const next = (Math.floor(curEuro/t)+1)*t*100;
         candidates.push(next);
       }
       let best = null;
       for(const c of candidates){
-        if(c<=paidCents && c>cur) best = best===null ? c : Math.max(best, c);
+        if(c<=paidCents && c>cur) best = best===null ? c : Math.max(best,c);
       }
       if(best===null) best = paidCents;
-      pushStep(best);
+      push(best);
       if(best===paidCents) break;
     }
     return steps;
   }
 
-  // ---------- State / Stats ----------
-  const DEFAULTS = { level: 1, showHints: true, showDetails: false };
+  // Smart rounding: ask 1..99 cents to reduce coins / make round euros.
+  function suggestRounding(totalCents, paidCents){
+    if(paidCents < totalCents) return null;
+    const change = paidCents - totalCents;
+    const base = countCoinsBills(change);
 
-  const state = {
-    level: DEFAULTS.level,
-    showHints: DEFAULTS.showHints,
-    showDetails: DEFAULTS.showDetails,
-    case: null,
-    startTime: null,
-    timerInt: null,
-    stats: null
-  };
+    const maxAsk = Math.min(99, paidCents-totalCents);
+    let best = null;
 
-  const LS_KEY = 'cashsim_stats_v1';
+    for(let ask=1; ask<=maxAsk; ask++){
+      const newTotal = totalCents + ask;
+      const newChange = paidCents - newTotal;
+      const m = countCoinsBills(newChange);
 
-  function loadStats(){
-    const raw = localStorage.getItem(LS_KEY);
-    if(raw){
-      try { return JSON.parse(raw); } catch(e){}
+      const score =
+        (m.coins * 1000) +
+        (newChange % 100 === 0 ? 0 : 200) +
+        ask +
+        m.bills;
+
+      if(best===null || score < best.score){
+        best = {ask, newTotal, newChange, score, base, m};
+      }
     }
-    return { solved:0, correct:0, mistakes:0, streak:0, bestStreak:0, timesMs:[], history:[] };
+    if(!best) return null;
+
+    const improvesCoins = best.m.coins < base.coins;
+    const improvesRound = (best.newChange%100===0) && (change%100!==0);
+    if(!(improvesCoins || improvesRound)) return null;
+
+    return best;
   }
 
-  function saveStats(){
-    localStorage.setItem(LS_KEY, JSON.stringify(state.stats));
+  // ---------------- Deals (unit) ----------------
+  // Applies best deal for quantity for a single product line.
+  function computeUnitLineTotalWithDeals(priceC, qty, deals){
+    if(!deals || !deals.length) return {totalC: priceC*qty, dealApplied:null};
+
+    // simple: choose the deal that minimizes total
+    let best = {totalC: priceC*qty, dealApplied:null};
+    for(const d of deals){
+      const packs = Math.floor(qty / d.buy);
+      const rest = qty % d.buy;
+      const totalC = packs*d.payCents + rest*priceC;
+      if(totalC < best.totalC){
+        best = {totalC, dealApplied:{buy:d.buy, payCents:d.payCents, packs, rest, label:(langNow()==='es'?d.noteES:d.noteFR)}};
+      }
+    }
+    return best;
   }
+
+  // ---------------- Training generation (uses catalogue) ----------------
+  function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
   function levelConfig(level){
     return {
       level,
-      maxItems: clamp(2 + level, 3, 9),
-      allow1c2c: level >= 3,
-      allowMixedPay: level >= 2,
-      allowBigBills: level >= 4,
-      maxTotalCents: [2000, 3500, 6000, 12000, 20000][clamp(level-1,0,4)]
+      itemsMin: clamp(3+level, 4, 8),
+      itemsMax: clamp(6+level*2, 8, 14),
+      allowBigBills: level>=4,
+      allowMixedPay: level>=3,
+      maxTotal: [3500, 6500, 10000, 18000, 28000][clamp(level-1,0,4)]
     };
   }
 
-  function randInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a; }
-  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
-
-  // ---------- Scenario generation ----------
-  function generateBasket(cfg){
+  function makeTrainingBasket(cfg){
+    const n = randInt(cfg.itemsMin, cfg.itemsMax);
     const items = [];
-    const n = randInt(2, cfg.maxItems);
 
-    const namesWeight = {
-      fr: ['Fromage','Jambon','Olives','Amandes','Fruits secs','Saucisson','Bonbons','Thé','Café','Tomates'],
-      es: ['Queso','Jamón','Aceitunas','Almendras','Frutos secos','Fuet','Caramelos','Té','Café','Tomates']
-    };
-    const namesUnit = {
-      fr: ['Confiture','Miel','Biscuit','Soda','Pain','Chocolat','Savon','Pâté','Terrine','Jus'],
-      es: ['Mermelada','Miel','Galletas','Refresco','Pan','Chocolate','Jabón','Paté','Terrina','Zumo']
-    };
-
-    const lang = langNow();
+    // Weighted selection: more day-to-day items
+    const pool = [
+      ...CATALOG.filter(p=>["gateaux_patis","gateaux_patis_special","gateau_broche","nougat","chocolats","turron"].includes(p.id)).flatMap(x=>Array(3).fill(x)),
+      ...CATALOG.filter(p=>["gateaux_esat","tapenade","terrine","confiture","miel","biere_petite","biere_grande"].includes(p.id)).flatMap(x=>Array(4).fill(x)),
+      ...CATALOG.filter(p=>["muscat","panier","nougat_cube"].includes(p.id)).flatMap(x=>Array(2).fill(x))
+    ];
 
     for(let i=0;i<n;i++){
-      const type = Math.random() < 0.55 ? 'weight' : 'unit';
-      if(type==='weight'){
-        const pricePerKgC = randInt(790, 3990);
-        const grams = randInt(80, 650);
-        const amountC = Math.round(pricePerKgC * grams / 1000);
-        const name = pick(namesWeight[lang] || namesWeight.fr);
-        items.push({ name, type, pricePerKgC, grams, amountC });
+      const prod = pick(pool);
+      if(prod.type==='weight'){
+        // grams: realistic, and more grams for cakes
+        let gMin=80, gMax=600;
+        if(prod.id.includes("gateau")){ gMin=120; gMax=850; }
+        if(prod.id.includes("nougat") || prod.id==="chocolats" || prod.id==="turron"){ gMin=90; gMax=420; }
+        const grams = randInt(gMin,gMax);
+        const amountC = Math.round(prod.pricePerKgC * grams / 1000);
+        items.push({
+          type:'weight',
+          catalogId: prod.id,
+          name: displayName(prod),
+          pricePerKgC: prod.pricePerKgC,
+          grams,
+          amountC,
+          vat20: !!prod.vat20,
+          note: displayNote(prod)
+        });
       } else {
-        const priceC = randInt(120, 1290);
-        const qty = randInt(1, (cfg.level>=4 ? 3 : 2));
-        const amountC = priceC*qty;
-        const name = pick(namesUnit[lang] || namesUnit.fr);
-        items.push({ name, type, priceC, qty, amountC });
+        let qty = randInt(1,3);
+        // sometimes more for promo items
+        if(prod.unitDeals && Math.random()<0.6){
+          qty = prod.unitDeals[0].buy; // exactly promo pack
+          if(Math.random()<0.25) qty += prod.unitDeals[0].buy; // double promo pack
+        }
+        const unit = computeUnitLineTotalWithDeals(prod.priceC, qty, prod.unitDeals);
+        items.push({
+          type:'unit',
+          catalogId: prod.id,
+          name: displayName(prod),
+          priceC: prod.priceC,
+          qty,
+          amountC: unit.totalC,
+          vat20: !!prod.vat20,
+          dealApplied: unit.dealApplied,
+          note: displayNote(prod)
+        });
       }
     }
 
     let total = items.reduce((s,it)=>s+it.amountC,0);
 
-    if(cfg.level === 1){
-      const endings = [0,10,20,50,70,80,90];
-      const want = pick(endings);
-      total = total - (total%100) + want;
-    } else if(cfg.level === 2){
-      const endings = [0,5,10,15,20,25,30,40,50,60,70,75,80,90,95];
-      const want = pick(endings);
-      total = total - (total%100) + want;
-    } else {
-      if(!cfg.allow1c2c){
-        const c = total % 100;
-        if(c===1) total += 4;
-        if(c===2) total += 3;
-        if(c===3) total += 2;
-        if(c===4) total += 1;
-        if(c===6) total += 4;
-        if(c===7) total += 3;
-        if(c===8) total += 2;
-        if(c===9) total += 1;
-      }
-    }
-
-    if(total > cfg.maxTotalCents){
-      const factor = cfg.maxTotalCents / total;
-      total = Math.max(100, Math.floor(total * factor));
+    // Training-friendly cents at low levels (avoid 1-2 cents too often)
+    if(cfg.level<=2){
       total = total - (total%5);
+    } else if(cfg.level===3){
+      const c = total%100;
+      if([1,2,3,4].includes(c)) total += (5-c);
+      if([6,7,8,9].includes(c)) total += (10-c);
     }
 
-    return { items, totalCents: total };
+    // Clamp
+    if(total > cfg.maxTotal){
+      const factor = cfg.maxTotal / total;
+      total = Math.max(300, Math.floor(total*factor));
+      total = total - (total % 5);
+    }
+
+    return {items, totalCents: total};
   }
 
   function generatePayment(totalCents, cfg){
-    const choices = [];
-    if(cfg.level>=2 && Math.random()<0.18) choices.push(totalCents);
-
-    const totalEuro = Math.floor((totalCents + 99)/100);
-    choices.push(totalEuro*100);
-
-    const steps = [500,1000,2000,5000,10000];
-    for(const s of steps){
-      const paid = Math.ceil(totalCents / s) * s;
-      choices.push(paid);
+    const options = [];
+    options.push(Math.ceil(totalCents/100)*100);
+    for(const step of [500, 1000, 2000, 5000, 10000]){
+      options.push(Math.ceil(totalCents/step)*step);
     }
-
     if(cfg.allowBigBills){
-      choices.push(10000);
-      choices.push(20000);
+      options.push(10000); options.push(20000);
+    }
+    if(cfg.level>=3 && Math.random()<0.10) options.push(totalCents);
+
+    let paid = pick(options.filter(x=>x>=totalCents));
+
+    // sometimes customer gives a bit odd amount (e.g. 50.00 + 0.20)
+    if(cfg.level>=4 && Math.random()<0.18){
+      const extra = pick([10,20,50,100,200]); // cents
+      if(paid+extra <= paid+500) paid += extra;
     }
 
-    let paidCents = pick(choices.filter(x=>x>=totalCents));
-
-    if(cfg.level<=2){
-      paidCents = Math.min(paidCents, totalCents + 5000);
-      if(paidCents < totalCents) paidCents = totalCents;
-    }
-
-    let breakdown = null;
-    if(cfg.allowMixedPay && Math.random()<0.55){
-      let rest = paidCents;
-      breakdown = [];
-      const n = randInt(2, cfg.level>=4 ? 5 : 4);
-
-      for(let i=0;i<n-1;i++){
-        const avail = DENOMS.filter(d => d<=rest);
-        const d = pick(avail);
-        breakdown.push(d);
-        rest -= d;
-        if(rest<=0) break;
-      }
-      if(rest>0) breakdown.push(rest);
-
-      const last = breakdown[breakdown.length-1];
-      if(!DENOMS.includes(last)){
-        breakdown.pop();
-        const extra = makeChangeBreakdown(last).flatMap(([d,k]) => Array(k).fill(d));
-        breakdown.push(...extra);
-      }
-
+    let breakdown = [paid];
+    if(cfg.allowMixedPay && Math.random()<0.65){
+      breakdown = makeBreakdown(paid).flatMap(([d,k])=>Array(k).fill(d));
       breakdown.sort(()=>Math.random()-0.5);
-    } else {
-      breakdown = [paidCents];
     }
-
-    return { paidCents, breakdown };
+    return {paidCents: paid, breakdown};
   }
 
-  function basketToText(basket){
-    const lang = langNow();
-    const lines = basket.items.map(it => {
+  function basketToText(items, totalCents){
+    const lines = items.map(it=>{
       if(it.type==='weight'){
         const p = (it.pricePerKgC/100).toFixed(2).replace('.', ',');
-        return lang === 'es'
-          ? `• ${it.name} (${it.grams} g a ${p} €/kg) = ${euroText(it.amountC)}`
-          : `• ${it.name} (${it.grams} g à ${p} €/kg) = ${euroText(it.amountC)}`;
+        return `• ${it.name} (${it.grams} g à ${p} €/kg) = ${euroText(it.amountC)}`;
+      } else {
+        const p = (it.priceC/100).toFixed(2).replace('.', ',');
+        const promo = it.dealApplied ? ` · promo: ${it.dealApplied.label}` : '';
+        return `• ${it.name} (${it.qty} × ${p} €) = ${euroText(it.amountC)}${promo}`;
       }
-      const p = (it.priceC/100).toFixed(2).replace('.', ',');
-      return `• ${it.name} (${it.qty} × ${p} €) = ${euroText(it.amountC)}`;
     });
-    lines.push(`\nTOTAL = ${euroText(basket.totalCents)}`);
+    lines.push(`\nTOTAL = ${euroText(totalCents)}`);
     return lines.join('\n');
   }
 
-  // ---------- UI ----------
+  // ---------------- App state / stats ----------------
+  const LS_KEY_STATS = 'payecash_stats_v3';
+  const LS_KEY_CHECK = 'payecash_check_v1';
+
+  const state = {
+    mode: 'training', // training | till | checklist
+    level: 3,
+    showHints: true,
+    showDetails: false,
+    startTime: null,
+    timerInt: null,
+    trainingCase: null,
+    stats: null,
+    tillItems: []
+  };
+
+  function loadStats(){
+    const raw = localStorage.getItem(LS_KEY_STATS);
+    if(raw){ try { return JSON.parse(raw); } catch(e){} }
+    return { solved:0, correct:0, mistakes:0, streak:0, bestStreak:0, timesMs:[] };
+  }
+  function saveStats(){ localStorage.setItem(LS_KEY_STATS, JSON.stringify(state.stats)); }
+
+  function renderStats(){
+    const s = state.stats;
+    el('solved').textContent = s.solved.toString();
+    el('mistakes').textContent = s.mistakes.toString();
+    el('streak').textContent = s.streak.toString();
+    const acc = s.solved ? Math.round((s.correct/s.solved)*100) : 0;
+    el('acc').textContent = `${acc}%`;
+    if(s.timesMs.length){
+      const avg = Math.round(s.timesMs.reduce((a,b)=>a+b,0)/s.timesMs.length);
+      el('avgTime').textContent = `${(avg/1000).toFixed(1)}s`;
+    } else el('avgTime').textContent='--';
+  }
+
+  // ---------------- Timer ----------------
+  function startTimer(){
+    if(state.timerInt) clearInterval(state.timerInt);
+    const tick = ()=>{
+      if(!state.startTime) return;
+      const ms = now()-state.startTime;
+      const s = Math.floor(ms/1000);
+      const m = Math.floor(s/60);
+      const ss = (s%60).toString().padStart(2,'0');
+      el('timer').textContent = `${m.toString().padStart(2,'0')}:${ss}`;
+    };
+    tick();
+    state.timerInt=setInterval(tick,250);
+  }
+
+  // ---------------- Mode switching ----------------
+  function setMode(mode){
+    state.mode = mode;
+
+    el('trainingPanel').style.display = (mode==='training') ? 'block' : 'none';
+    el('tillPanel').style.display = (mode==='till') ? 'block' : 'none';
+    el('checklistPanel').style.display = (mode==='checklist') ? 'block' : 'none';
+
+    el('tabTraining').classList.toggle('active', mode==='training');
+    el('tabTill').classList.toggle('active', mode==='till');
+    el('tabChecklist').classList.toggle('active', mode==='checklist');
+
+    el('tabTraining').setAttribute('aria-selected', mode==='training' ? 'true' : 'false');
+    el('tabTill').setAttribute('aria-selected', mode==='till' ? 'true' : 'false');
+    el('tabChecklist').setAttribute('aria-selected', mode==='checklist' ? 'true' : 'false');
+
+    el('mainTitle').textContent =
+      mode==='training' ? 'Entraînement réaliste' :
+      mode==='till' ? 'Vraie caisse' :
+      'Checklist';
+  }
+
+  // ---------------- Training UI ----------------
   function setFeedback(obj){
     const fb = el('feedback');
     if(!obj){
@@ -765,207 +987,147 @@
       return;
     }
     fb.style.display='block';
-    fb.textContent = obj.text;
-    fb.className = 'result ' + (obj.kind||'');
+    fb.textContent=obj.text;
+    fb.className='result ' + (obj.kind||'');
   }
 
-  function renderStats(){
-    const s = state.stats;
-    el('solved').textContent = String(s.solved);
-    el('mistakes').textContent = String(s.mistakes);
-    el('streak').textContent = String(s.streak);
+  function renderTrainingCase(){
+    const c = state.trainingCase;
+    if(!c) return;
 
-    const acc = s.solved ? Math.round((s.correct/s.solved)*100) : 0;
-    el('acc').textContent = `${acc}%`;
+    el('totalDisplay').textContent = euroText(c.totalCents);
+    el('paidDisplay').textContent = euroText(c.paidCents);
+    el('paidBreakdown').textContent = `Client: ${breakdownToString(makeBreakdown(c.paidCents))} (ou combo)`;
+    el('caseMeta').textContent = `Panier: ${c.items.length} article(s) · Catalogue magasin`;
 
-    const times = s.timesMs;
-    if(times.length){
-      const avg = Math.round(times.reduce((a,b)=>a+b,0)/times.length);
-      el('avgTime').textContent = `${(avg/1000).toFixed(1)}s`;
+    el('detailsBlock').textContent = basketToText(c.items, c.totalCents);
+    el('detailsBlock').style.display = state.showDetails ? 'block' : 'none';
+
+    const steps = countingUpSteps(c.totalCents, c.paidCents)
+      .map(s=>`- ${euroText(s.from)} → ${euroText(s.to)} : +${euroText(s.add)}`).join('\n');
+
+    const change = c.paidCents - c.totalCents;
+    const sug = suggestRounding(c.totalCents, c.paidCents);
+
+    let hint = `Aide “compléter jusqu’à”\n${steps || '(exact, rien à rendre)'}\n\nMonnaie: ${euroText(change)}\nBillets/pièces: ${breakdownToString(makeBreakdown(change))}`;
+    if(sug){
+      hint += `\n\nArrondi utile: demander ${euroText(sug.ask)} → monnaie devient ${euroText(sug.newChange)}\n(${breakdownToString(makeBreakdown(sug.newChange))})`;
     } else {
-      el('avgTime').textContent = '--';
+      hint += `\n\nArrondi: pas utile ici.`;
     }
+    el('hintBlock').textContent = hint;
+    el('hintBlock').style.display = state.showHints ? 'block' : 'none';
 
-    const ul = el('history');
-    ul.innerHTML = '';
-    for(const h of s.history.slice(0,10)){
-      const li = document.createElement('li');
-      const left = document.createElement('div');
-      left.innerHTML = `<div class="mono">${h.total} → ${h.paid}</div><div class="monoSmall">${h.note}</div>`;
-      const right = document.createElement('div');
-      right.className = 'mono';
-      right.textContent = h.ok ? '✅' : '❌';
-      li.appendChild(left);
-      li.appendChild(right);
-      ul.appendChild(li);
-    }
-  }
-
-  function renderCase(){
-    const c = state.case;
-
-    el('totalDisplay').textContent = euroText(c.basket.totalCents);
-    el('paidDisplay').textContent = euroText(c.pay.paidCents);
-
-    const cfg = levelConfig(state.level);
-    const lang = langNow();
-    el('caseMeta').textContent =
-      `Mode niveau ${cfg.level} · ${c.basket.items.length} article(s)` + (lang === 'es' ? ' · Client ES 🇪🇸' : ' · Client FR 🇫🇷');
-
-    // ici on affiche le vrai "combo client" s'il existe
-    el('paidBreakdown').textContent = `Détail: ${denomListToString(c.pay.breakdown)}`;
-
-    const d = el('detailsBlock');
-    d.textContent = basketToText(c.basket);
-    d.style.display = state.showDetails ? 'block' : 'none';
-
-    const h = el('hintBlock');
-    const stepLines = c.steps.map(s => `- ${euroText(s.from)} → ${euroText(s.to)} : +${euroText(s.add)}`).join('\n');
-    const chg = makeChangeBreakdown(c.changeCents);
-    h.innerHTML = `
-      <div style="font-weight:900;margin-bottom:6px">Aide “compléter jusqu’à”</div>
-      <div class="monoSmall" style="margin-bottom:8px">${stepLines || '(exact, rien à rendre)'}</div>
-      <div style="margin-top:6px"><b>Monnaie totale:</b> ${euroText(c.changeCents)} · <span class="monoSmall">Suggestion: ${breakdownToString(chg)}</span></div>
-      <div style="margin-top:8px"><b>Arrondi (option):</b> vers ${euroText(c.nextEuro)} → demander ${euroText(c.askCents)} · puis rendre ${Math.floor(c.roundedChangeCents/100)} €</div>
-    `;
-    h.style.display = state.showHints ? 'block' : 'none';
-
-    // quick phrases chips (FR/ES)
-    const L = PHRASES[lang] || PHRASES.fr;
+    // chips phrases
+    const L = PHRASES[langNow()] || PHRASES.fr;
     const qp = el('quickPhrases');
-    qp.innerHTML = '';
-
-    const ask = c.askCents;
-    const roundedChange = c.roundedChangeCents;
-    const x = (ask/100).toFixed(2).replace('.', ',');
-    const y = Math.floor(roundedChange/100).toString();
-
-    const chips = [];
+    qp.innerHTML='';
+    const chips=[];
     chips.push(`${L.greet} · ${L.pay}`);
 
-    if(ask > 0){
+    if(sug){
+      const x = centsToInput(sug.ask);
+      const promised = (sug.newChange%100===0) ? String(Math.floor(sug.newChange/100)) : centsToInput(sug.newChange);
       chips.push(L.roundingAsk(x));
-      chips.push(L.roundingAsk2(x, y));
+      chips.push(L.roundingAsk2(x, promised));
     } else {
-      const chgTxt = (c.changeCents/100).toFixed(2).replace('.', ',');
-      chips.push(L.exact(chgTxt));
+      chips.push(L.exact(centsToInput(change)));
     }
     chips.push(L.thanks);
 
     for(const t of chips){
-      const div = document.createElement('div');
-      div.className='chip';
-      div.textContent = t;
-      div.title = 'Clique pour pré-remplir le montant à demander (arrondi)';
-      div.addEventListener('click', () => {
-        if(ask>0) el('askInput').value = x;
+      const d=document.createElement('div');
+      d.className='chip';
+      d.textContent=t;
+      d.addEventListener('click', ()=>{
+        if(sug){
+          el('askInput').value = centsToInput(sug.ask);
+        }
       });
-      qp.appendChild(div);
+      qp.appendChild(d);
     }
 
-    el('levelLabel').textContent = String(state.level);
-    el('toggleDetails').textContent = state.showDetails ? 'Masquer détails' : 'Afficher détails';
-    el('toggleHints').textContent = state.showHints ? 'Aide ON' : 'Aide OFF';
-
+    el('levelLabel').textContent = state.level.toString();
     renderStats();
   }
 
-  // ---------- New case ----------
-  function newCase(){
+  function newTrainingCase(){
     const cfg = levelConfig(state.level);
-    const basket = generateBasket(cfg);
+    const basket = makeTrainingBasket(cfg);
     const pay = generatePayment(basket.totalCents, cfg);
 
-    const steps = countingUpSteps(basket.totalCents, pay.paidCents);
-    const changeCents = pay.paidCents - basket.totalCents;
-
-    const nextEuro = Math.ceil(basket.totalCents/100)*100;
-    const askCents = nextEuro - basket.totalCents;
-    const roundedChangeCents = pay.paidCents - nextEuro;
-
-    state.case = {
-      basket,
-      pay,
-      changeCents,
-      steps,
-      nextEuro,
-      askCents,
-      roundedChangeCents,
-      createdAt: now()
+    state.trainingCase = {
+      items: basket.items,
+      totalCents: basket.totalCents,
+      paidCents: pay.paidCents,
+      breakdown: pay.breakdown
     };
+
     state.startTime = now();
-
-    el('answerInput').value = '';
-    el('askInput').value = '';
+    el('answerInput').value='';
+    el('askInput').value='';
     setFeedback(null);
-    renderCase();
-
-    // focus sans scroll violent
-    try { el('answerInput').focus({preventScroll:true}); } catch { el('answerInput').focus(); }
+    renderTrainingCase();
+    el('answerInput').focus();
   }
 
-  // ---------- Validation ----------
-  function checkAnswer({showCorrection=false, panic=false} = {}){
-    const c = state.case;
-    const roundingMode = el('roundingMode').value;
+  function checkTraining({showCorrection=false, panic=false}={}){
+    const c = state.trainingCase;
+    if(!c) return;
 
-    const ansCents = parseEurosToCents(el('answerInput').value);
-    const askCentsInput = parseEurosToCents(el('askInput').value);
+    const ans = parseEurosToCents(el('answerInput').value);
+    const ask = parseEurosToCents(el('askInput').value);
 
-    if(ansCents===null){
+    if(ans===null){
       setFeedback({kind:'warn', text:'Entre une monnaie à rendre valide (ex: 18,25).'});
       return;
     }
 
-    const canRound = c.askCents>0 && c.nextEuro<=c.pay.paidCents;
-    let expectedChange = c.changeCents;
+    const roundingMode = el('roundingMode').value;
+    const baseChange = c.paidCents - c.totalCents;
+    const sug = suggestRounding(c.totalCents, c.paidCents);
+
+    let expectedChange = baseChange;
     let expectedAsk = null;
 
-    if(roundingMode==='off'){
-      expectedChange = c.changeCents;
-    } else {
-      const userProposes = askCentsInput!==null && askCentsInput>0;
-      const shouldPropose = roundingMode==='must';
+    const userProposes = ask!==null && ask>0;
 
-      if(userProposes){
-        expectedAsk = c.askCents;
-        expectedChange = c.roundedChangeCents;
-      } else if(shouldPropose && canRound){
-        expectedAsk = c.askCents;
-        expectedChange = c.roundedChangeCents;
-      } else {
-        expectedChange = c.changeCents;
+    if(roundingMode==='off'){
+      expectedChange = baseChange;
+    } else if(roundingMode==='must'){
+      if(sug){
+        expectedAsk = sug.ask;
+        expectedChange = sug.newChange;
+      }
+    } else {
+      // suggest optional: accept good rounding even if not optimal
+      if(userProposes && c.totalCents + ask <= c.paidCents){
+        const newChange = c.paidCents - (c.totalCents + ask);
+        const base = countCoinsBills(baseChange);
+        const m = countCoinsBills(newChange);
+        const improvesCoins = m.coins < base.coins;
+        const improvesRound = (newChange%100===0) && (baseChange%100!==0);
+        if(improvesCoins || improvesRound){
+          expectedAsk = ask;
+          expectedChange = newChange;
+        }
       }
     }
 
-    const okChange = ansCents === expectedChange;
-    let okAsk = true;
-
-    if(expectedAsk!==null){
-      okAsk = (askCentsInput === expectedAsk);
-    } else if(roundingMode==='must' && canRound){
-      okAsk = false;
-    }
-
+    const okChange = ans === expectedChange;
+    const okAsk = expectedAsk===null ? !(roundingMode==='must' && sug) : (ask===expectedAsk);
     const ok = okChange && okAsk;
-    const t = now() - state.startTime;
+
+    const t = now()-state.startTime;
 
     if(showCorrection || panic){
-      const steps = c.steps.map(s=>`• ${euroText(s.from)} → ${euroText(s.to)} : +${euroText(s.add)}`).join('\n');
-      const changeBreak = breakdownToString(makeChangeBreakdown(c.changeCents));
-      const roundedBreak = breakdownToString(makeChangeBreakdown(c.roundedChangeCents));
-      const corrLines = [];
-      corrLines.push(`Correction (méthode “compléter”):`);
-      corrLines.push(steps || '• Exact: rien à rendre');
-      corrLines.push(`\nMonnaie à rendre (sans arrondi): ${euroText(c.changeCents)} (${changeBreak})`);
-      if(c.askCents>0 && c.nextEuro<=c.pay.paidCents){
-        corrLines.push(`Arrondi possible: demander ${euroText(c.askCents)} pour arriver à ${euroText(c.nextEuro)}.`);
-        corrLines.push(`Puis rendre ${Math.floor(c.roundedChangeCents/100)} € (soit ${euroText(c.roundedChangeCents)} ; ${roundedBreak}).`);
-        corrLines.push(`Phrase type: ${formatAskPhraseFR(c.askCents, c.roundedChangeCents)}`);
-      } else {
-        corrLines.push(`Arrondi: inutile/impossible sur ce cas.`);
+      const steps = countingUpSteps(c.totalCents, c.paidCents)
+        .map(s=>`• ${euroText(s.from)} → ${euroText(s.to)} : +${euroText(s.add)}`).join('\n');
+      let txt = `Correction (compléter):\n${steps || '• Exact: rien à rendre'}\n\nSans arrondi: ${euroText(baseChange)} (${breakdownToString(makeBreakdown(baseChange))})`;
+      if(sug){
+        txt += `\n\nArrondi conseillé: demander ${euroText(sug.ask)} → rendre ${euroText(sug.newChange)} (${breakdownToString(makeBreakdown(sug.newChange))})`;
       }
-      setFeedback({kind: panic ? 'warn' : 'good', text: corrLines.join('\n')});
+      setFeedback({kind: panic?'warn':'good', text:txt});
       return;
     }
 
@@ -975,129 +1137,538 @@
       state.stats.streak += 1;
       state.stats.bestStreak = Math.max(state.stats.bestStreak, state.stats.streak);
       state.stats.timesMs.push(t);
+      saveStats();
+      renderStats();
+      setFeedback({kind:'good', text:`✅ Juste. Temps: ${(t/1000).toFixed(1)}s\nProchain client…`});
+      setTimeout(newTrainingCase, 350);
     } else {
       state.stats.mistakes += 1;
       state.stats.streak = 0;
+      saveStats();
+      renderStats();
+      let msg = `❌ Pas bon.\nAttendu: ${euroText(expectedChange)}.\n`;
+      if(roundingMode==='must' && sug){
+        msg += `Arrondi attendu: demander ${euroText(sug.ask)}.\n`;
+      }
+      msg += `Clique “Voir correction” pour les marches.`;
+      setFeedback({kind:'bad', text:msg});
     }
+  }
 
-    const noteParts = [];
-    if(roundingMode!=='off'){
-      noteParts.push(canRound
-        ? `Arrondi: demander ${euroText(c.askCents)} → rendre ${Math.floor(c.roundedChangeCents/100)}€`
-        : 'Arrondi: non pertinent');
-    }
-    noteParts.push(`Attendu: ${euroText(expectedChange)}`);
-    if(expectedAsk!==null) noteParts.push(`Ask: ${euroText(expectedAsk)}`);
+  // ---------------- Till mode ----------------
+  function makeRow(item, idx){
+    const tr = document.createElement('tr');
 
-    state.stats.history.unshift({
-      ts: new Date().toISOString(),
-      total: euroText(c.basket.totalCents),
-      paid: euroText(c.pay.paidCents),
-      ok,
-      note: noteParts.join(' · ')
+    const tdType = document.createElement('td');
+    const sel = document.createElement('select');
+    sel.innerHTML = `
+      <option value="unit"${item.type==='unit'?' selected':''}>Unité</option>
+      <option value="weight"${item.type==='weight'?' selected':''}>Poids</option>
+      <option value="direct"${item.type==='direct'?' selected':''}>Montant</option>
+    `;
+    sel.addEventListener('change', ()=>{
+      item.type = sel.value;
+      if(item.type==='unit'){ item.priceC = item.priceC ?? 0; item.qty = item.qty ?? 1; item.unitDeals = item.unitDeals ?? null; }
+      if(item.type==='weight'){ item.pricePerKgC = item.pricePerKgC ?? 0; item.grams = item.grams ?? 0; }
+      if(item.type==='direct'){ item.amountC = item.amountC ?? 0; }
+      renderTill();
     });
-    state.stats.history = state.stats.history.slice(0, 100);
+    tdType.appendChild(sel);
 
-    saveStats();
-    renderStats();
+    const tdLabel = document.createElement('td');
+    const inpLabel = document.createElement('input');
+    inpLabel.placeholder = 'Libellé';
+    inpLabel.value = item.label || '';
+    inpLabel.addEventListener('input', ()=>{ item.label = inpLabel.value; });
+    tdLabel.appendChild(inpLabel);
 
-    if(ok){
-      setFeedback({kind:'good', text:`✅ Juste. Temps: ${(t/1000).toFixed(1)}s\nProchain client prêt.`});
-      setTimeout(newCase, 350);
+    const tdPrice = document.createElement('td');
+    tdPrice.className='cell-mini';
+    const inpPrice = document.createElement('input');
+    inpPrice.inputMode='decimal';
+
+    const tdQty = document.createElement('td');
+    tdQty.className='cell-mini';
+    const inpQty = document.createElement('input');
+    inpQty.inputMode='decimal';
+
+    const tdLine = document.createElement('td');
+    tdLine.className='cell-mid';
+    const lineSpan = document.createElement('span');
+    lineSpan.className='mono';
+    tdLine.appendChild(lineSpan);
+
+    function updateInputs(){
+      if(item.type==='unit'){
+        inpPrice.placeholder='Prix unité (€)';
+        inpPrice.value = item.priceC!=null ? centsToInput(item.priceC) : '';
+        inpQty.placeholder='Qté';
+        inpQty.value = item.qty!=null ? String(item.qty) : '1';
+      } else if(item.type==='weight'){
+        inpPrice.placeholder='Prix/kg (€)';
+        inpPrice.value = item.pricePerKgC!=null ? centsToInput(item.pricePerKgC) : '';
+        inpQty.placeholder='Grammes';
+        inpQty.value = item.grams!=null ? String(item.grams) : '';
+      } else {
+        inpPrice.placeholder='Montant (€)';
+        inpPrice.value = item.amountC!=null ? centsToInput(item.amountC) : '';
+        inpQty.placeholder='—';
+        inpQty.value = '';
+      }
+    }
+
+    inpPrice.addEventListener('input', ()=>{
+      const v = parseEurosToCents(inpPrice.value);
+      if(item.type==='unit'){ item.priceC = v ?? 0; }
+      else if(item.type==='weight'){ item.pricePerKgC = v ?? 0; }
+      else { item.amountC = v ?? 0; }
+      renderTillTotalsOnly();
+    });
+
+    inpQty.addEventListener('input', ()=>{
+      if(item.type==='unit'){
+        const q = parseInt(inpQty.value,10);
+        item.qty = Number.isFinite(q) && q>0 ? q : 1;
+      } else if(item.type==='weight'){
+        const g = parseInt(inpQty.value,10);
+        item.grams = Number.isFinite(g) && g>=0 ? g : 0;
+      }
+      renderTillTotalsOnly();
+    });
+
+    tdPrice.appendChild(inpPrice);
+    tdQty.appendChild(inpQty);
+
+    const tdAct = document.createElement('td');
+    tdAct.className='cell-actions';
+    const del = document.createElement('button');
+    del.className='btn small danger';
+    del.textContent='Suppr.';
+    del.addEventListener('click', ()=>{
+      state.tillItems.splice(idx,1);
+      renderTill();
+    });
+    tdAct.appendChild(del);
+
+    tr.appendChild(tdType);
+    tr.appendChild(tdLabel);
+    tr.appendChild(tdPrice);
+    tr.appendChild(tdQty);
+    tr.appendChild(tdLine);
+    tr.appendChild(tdAct);
+
+    function lineTotalCents(){
+      if(item.type==='unit'){
+        const price = item.priceC ?? 0;
+        const qty = item.qty ?? 1;
+        const r = computeUnitLineTotalWithDeals(price, qty, item.unitDeals);
+        tr._dealLabel = r.dealApplied?.label || null;
+        return r.totalC;
+      }
+      if(item.type==='weight'){
+        const pk = item.pricePerKgC ?? 0;
+        const g = item.grams ?? 0;
+        tr._dealLabel = null;
+        return Math.round(pk * g / 1000);
+      }
+      tr._dealLabel = null;
+      return item.amountC ?? 0;
+    }
+
+    function refreshLine(){
+      updateInputs();
+      const lt = lineTotalCents();
+      if(tr._dealLabel){
+        lineSpan.textContent = `${euroText(lt)} (promo: ${tr._dealLabel})`;
+      } else {
+        lineSpan.textContent = euroText(lt);
+      }
+    }
+
+    tr._refreshLine = refreshLine;
+    tr._lineTotalCents = lineTotalCents;
+    refreshLine();
+    return tr;
+  }
+
+  function tillTotalCents(){
+    let sum=0;
+    const tbody = el('itemsBody');
+    for(const tr of Array.from(tbody.children)){
+      if(typeof tr._lineTotalCents==='function') sum += tr._lineTotalCents();
+    }
+    return sum;
+  }
+
+  function renderPhraseChips(container, texts, appointToCopyCents){
+    container.innerHTML='';
+    for(const t of texts){
+      const d=document.createElement('div');
+      d.className='chip';
+      d.textContent=t;
+      d.addEventListener('click', ()=>{
+        if(appointToCopyCents!=null){
+          const v = centsToInput(appointToCopyCents);
+          navigator.clipboard?.writeText(v);
+        }
+      });
+      container.appendChild(d);
+    }
+  }
+
+  function updateTillSummary(){
+    const total = tillTotalCents();
+    const paid = parseEurosToCents(el('tillPaidInput').value) ?? 0;
+
+    el('tillTotal').textContent = euroText(total);
+    el('tillTotal2').textContent = euroText(total);
+    el('tillPaid2').textContent = euroText(paid);
+
+    if(paid < total){
+      el('tillChange').textContent = '—';
+      el('tillWarn').textContent = `Paiement insuffisant: il manque ${euroText(total-paid)}.`;
+      el('tillWarn').style.color = 'var(--warn)';
+      el('tillSuggestionText').textContent = 'Paiement insuffisant, pas de suggestion.';
+      el('tillPhrases').innerHTML='';
+      return;
+    }
+
+    const change = paid - total;
+    el('tillChange').textContent = euroText(change);
+    el('tillWarn').textContent = `Billets/pièces: ${breakdownToString(makeBreakdown(change))}`;
+    el('tillWarn').style.color = 'var(--muted)';
+
+    const sug = suggestRounding(total, paid);
+    const L = PHRASES[langNow()] || PHRASES.fr;
+
+    if(!sug){
+      el('tillSuggestionText').textContent = `Pas d’arrondi utile ici. (Monnaie: ${euroText(change)})`;
+      renderPhraseChips(el('tillPhrases'), [
+        `${L.greet} · ${L.pay}`,
+        L.exact(centsToInput(change)),
+        L.thanks
+      ], null);
+      return;
+    }
+
+    const askTxt = centsToInput(sug.ask);
+    const promised = (sug.newChange%100===0) ? String(Math.floor(sug.newChange/100)) : centsToInput(sug.newChange);
+
+    const base = countCoinsBills(change);
+    const after = countCoinsBills(sug.newChange);
+
+    el('tillSuggestionText').textContent =
+      `Demander ${euroText(sug.ask)} → monnaie devient ${euroText(sug.newChange)}.\n`+
+      `Pièces: ${base.coins} → ${after.coins} (objectif: moins de pièces).`;
+
+    renderPhraseChips(el('tillPhrases'), [
+      `${L.greet} · ${L.pay}`,
+      L.roundingAsk(askTxt),
+      L.roundingAsk2(askTxt, promised),
+      L.thanks
+    ], sug.ask);
+  }
+
+  function renderTillTotalsOnly(){
+    const tbody = el('itemsBody');
+    for(const tr of Array.from(tbody.children)){
+      if(tr._refreshLine) tr._refreshLine();
+    }
+    updateTillSummary();
+  }
+
+  function renderTill(){
+    const tbody = el('itemsBody');
+    tbody.innerHTML='';
+    state.tillItems.forEach((it, idx)=>{
+      const tr = makeRow(it, idx);
+      tbody.appendChild(tr);
+    });
+    renderTillTotalsOnly();
+  }
+
+  function addTillItem(type){
+    if(type==='unit'){
+      state.tillItems.push({type:'unit', label:'', priceC:0, qty:1, unitDeals:null});
+    } else if(type==='weight'){
+      state.tillItems.push({type:'weight', label:'', pricePerKgC:0, grams:0});
     } else {
-      let msg = `❌ Pas bon.\n`;
-      if(!okAsk){
-        msg += `Arrondi: attendu “demander ${euroText(c.askCents)}” (et rendre ${Math.floor(c.roundedChangeCents/100)} €).\n`;
-      }
-      msg += `Attendu: ${euroText(expectedChange)}.\n`;
-      msg += `Clique “Voir correction” pour la marche “compléter”.`;
-      setFeedback({kind:'bad', text: msg});
+      state.tillItems.push({type:'direct', label:'', amountC:0});
+    }
+    renderTill();
+  }
+
+  // ---------------- Catalogue UI (till mode) ----------------
+  function refreshCatalogSelect(filterText=''){
+    const s = el('catalogSelect');
+    s.innerHTML='';
+
+    const ft = (filterText||'').trim().toLowerCase();
+    const list = CATALOG
+      .filter(p=>{
+        const name = (p.nameFR + ' ' + (p.nameES||'') + ' ' + (p.noteFR||'')).toLowerCase();
+        return ft ? name.includes(ft) : true;
+      })
+      .sort((a,b)=> (displayName(a)).localeCompare(displayName(b), 'fr'));
+
+    for(const p of list){
+      const opt = document.createElement('option');
+      opt.value = p.id;
+      const priceTxt = p.type==='weight' ? `${centsToInput(p.pricePerKgC)}€/kg` : `${centsToInput(p.priceC)}€`;
+      opt.textContent = `${displayName(p)} · ${priceTxt}${p.vat20?' · TVA20':''}${dealsText(p)?' · '+dealsText(p):''}`;
+      s.appendChild(opt);
+    }
+    if(list.length){
+      s.value = list[0].id;
+      renderCatalogInfo();
+    } else {
+      el('catalogInfo').textContent = 'Aucun produit trouvé.';
     }
   }
 
-  // ---------- Timer ----------
-  function startTimer(){
-    if(state.timerInt) clearInterval(state.timerInt);
-    const tick = () => {
-      if(!state.startTime) return;
-      const ms = now() - state.startTime;
-      const s = Math.floor(ms/1000);
-      const m = Math.floor(s/60);
-      const ss = (s%60).toString().padStart(2,'0');
-      el('timer').textContent = `${m.toString().padStart(2,'0')}:${ss}`;
+  function getSelectedProduct(){
+    const id = el('catalogSelect').value;
+    return CATALOG.find(p=>p.id===id) || null;
+  }
+
+  function renderCatalogInfo(){
+    const p = getSelectedProduct();
+    if(!p){ el('catalogInfo').textContent='—'; return; }
+
+    const name = displayName(p);
+    const note = displayNote(p);
+    const deals = dealsText(p);
+    const priceLine = p.type==='weight'
+      ? `Prix: ${centsToInput(p.pricePerKgC)} €/kg`
+      : `Prix: ${centsToInput(p.priceC)} € / pièce`;
+    const vat = p.vat20 ? 'TVA 20% (alcool/nougat)' : 'TVA 20%: non (note)';
+    el('catalogInfo').textContent =
+      `${name}\n${priceLine}\n${deals ? ('Promo: '+deals+'\n') : ''}${vat}\n\n${note || ''}`.trim();
+
+    // hints for qty/grams
+    if(p.type==='weight'){
+      el('catalogGrams').disabled = false;
+      el('catalogQty').disabled = true;
+      el('catalogQty').value = '';
+      el('catalogGrams').placeholder = 'Grammes (ex: 200)';
+      el('dealHint').textContent = deals ? `Promo disponible (souvent à l’unité). Ici: ${deals}` : 'Produit au poids.';
+    } else {
+      el('catalogGrams').disabled = true;
+      el('catalogQty').disabled = false;
+      el('catalogGrams').value = '';
+      el('catalogQty').placeholder = 'Qté (ex: 1, 2, 3)';
+      el('dealHint').textContent = deals ? `Astuce: la promo s’applique au calcul de ligne (${deals}).` : 'Produit à l’unité.';
+    }
+    el('applyDeal').disabled = !(p.unitDeals && p.unitDeals.length && p.type==='unit');
+  }
+
+  function addFromCatalog(applyPromo=false){
+    const p = getSelectedProduct();
+    if(!p) return;
+
+    if(p.type==='weight'){
+      const grams = parseInt(el('catalogGrams').value,10);
+      const g = Number.isFinite(grams) && grams>0 ? grams : 200;
+      state.tillItems.push({
+        type:'weight',
+        label: displayName(p),
+        pricePerKgC: p.pricePerKgC,
+        grams: g
+      });
+    } else {
+      const qtyRaw = parseInt(el('catalogQty').value,10);
+      const qty = Number.isFinite(qtyRaw) && qtyRaw>0 ? qtyRaw : 1;
+      state.tillItems.push({
+        type:'unit',
+        label: displayName(p),
+        priceC: p.priceC,
+        qty,
+        unitDeals: applyPromo ? (p.unitDeals||null) : null
+      });
+    }
+    renderTill();
+  }
+
+  // ---------------- Checklist ----------------
+  const CHECK_OPEN = [
+    {id:"facing", text:"Facing du magasin régulièrement, charger le magasin (pas de trous)."},
+    {id:"notes_produits", text:"Relire notes produits (vins, gâteaux, nougat) si besoin."},
+    {id:"heures", text:"Noter ses heures quotidiennement."},
+    {id:"demander_appoint", text:"Demander régulièrement la monnaie / l’appoint au client."},
+    {id:"menage", text:"Ménage régulièrement."}
+  ];
+  const CHECK_CLOSE = [
+    {id:"tpe_cb", text:"TPE le soir: CB telecollect à faire."},
+    {id:"cb_totaux", text:"Montant CB sur appareil = mes totaux."},
+    {id:"clim", text:"Éteindre la clim le soir."},
+    {id:"papier_tpe", text:"Changer rouleau de TPE quand papier rose."},
+    {id:"truc_mythe", text:"Penser important au ‘truc à mythe’ le soir."},
+    {id:"poubelle", text:"Sortir poubelle lundi soir et la rentrer mardi matin."},
+    {id:"cle_caisse", text:"Ranger la clé de la caisse sous une bouteille de vin."},
+    {id:"enveloppe", text:"Enveloppe du soir: date en haut, SPN au milieu, CA en bas."}
+  ];
+
+  function loadCheckState(){
+    const raw = localStorage.getItem(LS_KEY_CHECK);
+    if(raw){ try { return JSON.parse(raw); } catch(e){} }
+    return {};
+  }
+  function saveCheckState(obj){
+    localStorage.setItem(LS_KEY_CHECK, JSON.stringify(obj));
+  }
+
+  function renderChecklist(){
+    const st = loadCheckState();
+
+    const open = el('checklistOpen');
+    const close = el('checklistClose');
+
+    // clear (keep title line already in HTML)
+    open.innerHTML = '<div class="muted" style="margin-bottom:8px">Ouverture / journée</div>';
+    close.innerHTML = '<div class="muted" style="margin-bottom:8px">Fermeture / soir</div>';
+
+    const mk = (item)=>{
+      const wrap = document.createElement('label');
+      const cb = document.createElement('input');
+      cb.type='checkbox';
+      cb.checked = !!st[item.id];
+      cb.addEventListener('change', ()=>{
+        const s2 = loadCheckState();
+        s2[item.id] = cb.checked;
+        saveCheckState(s2);
+      });
+      const txt = document.createElement('div');
+      txt.textContent = item.text;
+      wrap.appendChild(cb);
+      wrap.appendChild(txt);
+      return wrap;
     };
-    tick();
-    state.timerInt = setInterval(tick, 250);
+
+    for(const it of CHECK_OPEN) open.appendChild(mk(it));
+    for(const it of CHECK_CLOSE) close.appendChild(mk(it));
   }
 
-  // ---------- Events ----------
-  function bind(){
-    el('newCase').addEventListener('click', newCase);
-    el('check').addEventListener('click', () => checkAnswer());
-    el('showSolution').addEventListener('click', () => checkAnswer({showCorrection:true}));
-    el('panic').addEventListener('click', () => checkAnswer({panic:true}));
+  function setAllChecks(value){
+    const st = loadCheckState();
+    [...CHECK_OPEN, ...CHECK_CLOSE].forEach(it=> st[it.id]=value);
+    saveCheckState(st);
+    renderChecklist();
+  }
 
-    el('toggleHints').addEventListener('click', () => {
+  // ---------------- Events ----------------
+  el('tabTraining').addEventListener('click', ()=>setMode('training'));
+  el('tabTill').addEventListener('click', ()=>{
+    setMode('till');
+    updateTillSummary();
+  });
+  el('tabChecklist').addEventListener('click', ()=>{
+    setMode('checklist');
+    renderChecklist();
+  });
+
+  el('newCase').addEventListener('click', ()=> { if(state.mode==='training') newTrainingCase(); });
+
+  el('toggleHints').addEventListener('click', ()=>{
+    state.showHints = !state.showHints;
+    el('toggleHints').textContent = state.showHints ? 'Aide ON' : 'Aide OFF';
+    if(state.mode==='training') renderTrainingCase();
+  });
+  el('toggleDetails').addEventListener('click', ()=>{
+    state.showDetails = !state.showDetails;
+    el('toggleDetails').textContent = state.showDetails ? 'Afficher détails' : 'Masquer détails';
+    if(state.mode==='training') renderTrainingCase();
+  });
+
+  el('check').addEventListener('click', ()=>checkTraining());
+  el('showSolution').addEventListener('click', ()=>checkTraining({showCorrection:true}));
+  el('panic').addEventListener('click', ()=>checkTraining({panic:true}));
+
+  el('levelUp').addEventListener('click', ()=>{
+    state.level = clamp(state.level+1, 1, 5);
+    el('levelLabel').textContent = state.level.toString();
+    if(state.mode==='training') newTrainingCase();
+  });
+  el('levelDown').addEventListener('click', ()=>{
+    state.level = clamp(state.level-1, 1, 5);
+    el('levelLabel').textContent = state.level.toString();
+    if(state.mode==='training') newTrainingCase();
+  });
+
+  el('customerLang').addEventListener('change', ()=>{
+    // refresh catalog labels + info + training case
+    refreshCatalogSelect(el('catalogSearch').value);
+    if(state.mode==='training') newTrainingCase();
+    renderCatalogInfo();
+    updateTillSummary();
+  });
+
+  el('resetStats').addEventListener('click', ()=>{
+    if(confirm('Réinitialiser les statistiques locales ?')){
+      localStorage.removeItem(LS_KEY_STATS);
+      state.stats = loadStats();
+      renderStats();
+      setFeedback({kind:'warn', text:'Stats réinitialisées.'});
+    }
+  });
+
+  el('exportStats').addEventListener('click', ()=>{
+    const data = JSON.stringify({level: state.level, stats: state.stats}, null, 2);
+    navigator.clipboard?.writeText(data).then(()=> alert('Stats copiées (JSON).')).catch(()=>console.log(data));
+  });
+
+  // Till controls
+  el('addUnit').addEventListener('click', ()=>addTillItem('unit'));
+  el('addWeight').addEventListener('click', ()=>addTillItem('weight'));
+  el('addDirect').addEventListener('click', ()=>addTillItem('direct'));
+  el('clearItems').addEventListener('click', ()=>{
+    if(confirm('Supprimer toutes les lignes ?')){
+      state.tillItems = [];
+      renderTill();
+    }
+  });
+  el('tillPaidInput').addEventListener('input', ()=>updateTillSummary());
+
+  // Catalogue controls
+  el('catalogSearch').addEventListener('input', ()=> refreshCatalogSelect(el('catalogSearch').value));
+  el('catalogSelect').addEventListener('change', ()=> renderCatalogInfo());
+  el('catalogAdd').addEventListener('click', ()=> addFromCatalog(false));
+  el('applyDeal').addEventListener('click', ()=> addFromCatalog(true));
+
+  // Checklist controls
+  el('checkAll').addEventListener('click', ()=> setAllChecks(true));
+  el('uncheckAll').addEventListener('click', ()=> setAllChecks(false));
+
+  // keyboard shortcuts
+  window.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter' && state.mode==='training'){
+      const tag = (document.activeElement?.tagName || '').toLowerCase();
+      if(tag!=='select') checkTraining();
+    }
+    if(e.key.toLowerCase()==='n' && state.mode==='training') newTrainingCase();
+    if(e.key.toLowerCase()==='h' && state.mode==='training'){
       state.showHints = !state.showHints;
-      renderCase();
-    });
+      el('toggleHints').textContent = state.showHints ? 'Aide ON' : 'Aide OFF';
+      renderTrainingCase();
+    }
+  });
 
-    el('toggleDetails').addEventListener('click', () => {
-      state.showDetails = !state.showDetails;
-      renderCase();
-    });
-
-    el('levelUp').addEventListener('click', () => {
-      state.level = clamp(state.level+1, 1, 5);
-      newCase();
-    });
-
-    el('levelDown').addEventListener('click', () => {
-      state.level = clamp(state.level-1, 1, 5);
-      newCase();
-    });
-
-    el('resetStats').addEventListener('click', () => {
-      if(confirm('Réinitialiser les statistiques locales ?')){
-        localStorage.removeItem(LS_KEY);
-        state.stats = loadStats();
-        renderStats();
-        setFeedback({kind:'warn', text:'Stats réinitialisées.'});
-      }
-    });
-
-    el('exportStats').addEventListener('click', async () => {
-      const data = JSON.stringify({level: state.level, stats: state.stats}, null, 2);
-      try{
-        await navigator.clipboard.writeText(data);
-        setFeedback({kind:'good', text:'Stats copiées dans le presse-papiers (JSON).'});
-      } catch(e){
-        setFeedback({kind:'warn', text:'Copie auto impossible. (Regarde la console)'}); 
-        console.log(data);
-      }
-    });
-
-    el('customerLang').addEventListener('change', () => newCase());
-
-    window.addEventListener('keydown', (e) => {
-      if(e.key === 'Enter'){
-        const tag = (document.activeElement?.tagName || '').toLowerCase();
-        if(tag !== 'select') checkAnswer();
-      }
-      if(e.key.toLowerCase() === 'n') newCase();
-      if(e.key.toLowerCase() === 'h'){
-        state.showHints = !state.showHints;
-        renderCase();
-      }
-    });
-  }
-
-  // ---------- Boot ----------
+  // ---------------- Boot ----------------
   function boot(){
     state.stats = loadStats();
-    bind();
+    renderStats();
     startTimer();
-    newCase();
+
+    setMode('training');
+
+    // init catalog UI
+    refreshCatalogSelect('');
+    renderCatalogInfo();
+
+    // init till with one line
+    addTillItem('unit');
+
+    // start training
+    newTrainingCase();
   }
 
   boot();
