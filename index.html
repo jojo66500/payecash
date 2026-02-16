@@ -1,4 +1,3 @@
-html
 <!doctype html>
 <html lang="fr">
 <head>
@@ -237,15 +236,6 @@ html
       <span class="badge">⏱️ <span id="timer">00:00</span></span>
       <span class="badge">🎯 Série <span id="streak">0</span></span>
       <span class="badge">📈 Niveau <span id="levelLabel">1</span></span>
-
-      <span class="badge">
-        🧑‍💼 Client
-        <select id="customerLang" style="width:auto; padding:6px 10px; border-radius:10px">
-          <option value="fr">FR</option>
-          <option value="es">ES</option>
-        </select>
-      </span>
-
       <button class="btn small ghost" id="resetStats">Réinitialiser stats</button>
     </div>
   </header>
@@ -404,28 +394,11 @@ html
   }
 
   function formatAskPhrase(askCents, changeRoundedCents){
+    // askCents: what we ask client to add; changeRoundedCents: change after rounding
     const ask = (askCents/100).toFixed(2).replace('.', ',');
-    const chg = Math.floor(changeRoundedCents/100).toString();
+    const chg = Math.floor(changeRoundedCents/100).toString(); // rounded change is integer euros
     return `“Si vous avez ${ask} €, ça m’arrange, je vous rends ${chg} € tout rond.”`;
   }
-
-  // ---------- Phrasebook (FR/ES) ----------
-  const PHRASES = {
-    fr: {
-      greet: "Bonjour 🙂",
-      pay: "Je paie en espèces.",
-      roundingAsk: (x) => `Vous auriez ${x} € ? Comme ça je vous rends tout rond.`,
-      roundingAsk2: (x,y) => `Si vous avez ${x} €, ça m’arrange, je vous rends ${y} € tout rond.`,
-      thanks: "Merci, bonne journée !"
-    },
-    es: {
-      greet: "Hola 🙂",
-      pay: "Pago en efectivo.",
-      roundingAsk: (x) => `¿Tienes ${x} €? Así te devuelvo redondo.`,
-      roundingAsk2: (x,y) => `Si tienes ${x} €, mejor, así te devuelvo ${y} € justo.`,
-      thanks: "¡Gracias, buen día!"
-    }
-  };
 
   // ---------- Money system ----------
   const COINS = [200,100,50,20,10,5,2,1]; // cents
@@ -433,6 +406,7 @@ html
   const DENOMS = [...BILLS, ...COINS];
 
   function makeChangeBreakdown(amountCents){
+    // Greedy breakdown for display (not mandatory optimal in all currency systems, but for EUR it works fine).
     let rest = amountCents;
     const out = [];
     for(const d of DENOMS){
@@ -454,6 +428,7 @@ html
   }
 
   function countingUpSteps(totalCents, paidCents){
+    // Build steps: total -> next euro -> then to next 5/10/20/50... -> paid
     let cur = totalCents;
     const steps = [];
     const pushStep = (to) => {
@@ -463,22 +438,29 @@ html
       }
     };
 
+    // 1) to next euro
     const mod = cur % 100;
     if(mod !== 0) pushStep(cur + (100 - mod));
 
-    const niceEuroTargets = [5,10,20,50,100,200,500];
+    // 2) climb via "nice" paliers
+    // We'll repeatedly jump to next target among: next 5€, 10€, 20€, 50€... without overshooting
+    const niceEuroTargets = [5,10,20,50,100,200,500]; // euros
     while(cur < paidCents){
       const curEuro = Math.floor(cur/100);
+      // propose next targets in euros
       const candidates = [];
+      // next 1€
       candidates.push((curEuro+1)*100);
       for(const t of niceEuroTargets){
         const next = (Math.floor(curEuro / t) + 1)*t*100;
         candidates.push(next);
       }
+      // choose the largest candidate that is <= paid
       let best = null;
       for(const c of candidates){
         if(c<=paidCents && c>cur) best = best===null ? c : Math.max(best, c);
       }
+      // if none, just go straight to paid
       if(best===null) best = paidCents;
       pushStep(best);
       if(best===paidCents) break;
@@ -517,7 +499,7 @@ html
       streak: 0,
       bestStreak: 0,
       timesMs: [],
-      history: []
+      history: [] // newest first
     };
   }
   function saveStats(){
@@ -525,6 +507,7 @@ html
   }
 
   function levelConfig(level){
+    // Focus: increase difficulty by adding 1/2/5 centimes, mixed payments, heavier baskets
     const cfg = {
       level,
       maxItems: clamp(2 + level, 3, 9),
@@ -541,63 +524,76 @@ html
   function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
 
   function generateBasket(cfg){
+    // Items: weighted goods + unit goods
     const items = [];
     const n = randInt(2, cfg.maxItems);
-
-    const lang = document.getElementById('customerLang')?.value || 'fr';
-    const namesWeight = {
-      fr: ['Fromage','Jambon','Olives','Amandes','Fruits secs','Saucisson','Bonbons','Thé','Café','Tomates'],
-      es: ['Queso','Jamón','Aceitunas','Almendras','Frutos secos','Fuet','Caramelos','Té','Café','Tomates']
-    };
-    const namesUnit = {
-      fr: ['Confiture','Miel','Biscuit','Soda','Pain','Chocolat','Savon','Pâté','Terrine','Jus'],
-      es: ['Mermelada','Miel','Galletas','Refresco','Pan','Chocolate','Jabón','Paté','Terrina','Zumo']
-    };
-
     for(let i=0;i<n;i++){
       const type = Math.random() < 0.55 ? 'weight' : 'unit';
       if(type==='weight'){
+        // price/kg from 7.90 to 39.90
         const pricePerKgC = randInt(790, 3990);
+        // grams: 80g to 650g
         const grams = randInt(80, 650);
+        // amount = price/kg * grams / 1000 => cents
         const amountC = Math.round(pricePerKgC * grams / 1000);
-        const name = pick(namesWeight[lang] || namesWeight.fr);
-        items.push({ name, type, pricePerKgC, grams, amountC });
+        const name = pick(['Fromage','Jambon','Olives','Amandes','Fruits secs','Saucisson','Bonbons','Thé','Café','Tomates']);
+        items.push({
+          name,
+          type,
+          pricePerKgC,
+          grams,
+          amountC
+        });
       } else {
         const priceC = randInt(120, 1290);
         const qty = randInt(1, (cfg.level>=4 ? 3 : 2));
-        const amountC = priceC*qty;
-        const name = pick(namesUnit[lang] || namesUnit.fr);
-        items.push({ name, type, priceC, qty, amountC });
+        const name = pick(['Confiture','Miel','Biscuit','Soda','Pain','Chocolat','Savon','Pâté','Terrine','Jus']);
+        items.push({
+          name,
+          type,
+          priceC,
+          qty,
+          amountC: priceC*qty
+        });
       }
     }
-
+    // total
     let total = items.reduce((s,it)=>s+it.amountC,0);
 
+    // adjust cents style depending level
+    // Make totals more "training-friendly" at low levels
     if(cfg.level === 1){
+      // force 0,10 or 0,20 or 0,50 endings
       const endings = [0,10,20,50,70,80,90];
       const want = pick(endings);
       total = total - (total%100) + want;
     } else if(cfg.level === 2){
+      // allow 0,05 & 0,95
       const endings = [0,5,10,15,20,25,30,40,50,60,70,75,80,90,95];
       const want = pick(endings);
       total = total - (total%100) + want;
     } else {
+      // allow full cents, optionally 1c/2c
       if(!cfg.allow1c2c){
+        // avoid 1-2 cents
         const c = total % 100;
-        if(c===1) total += 4;
-        if(c===2) total += 3;
-        if(c===3) total += 2;
-        if(c===4) total += 1;
-        if(c===6) total += 4;
+        if(c===1) total += 4; // -> 5
+        if(c===2) total += 3; // -> 5
+        if(c===3) total += 2; // -> 5
+        if(c===4) total += 1; // -> 5
+        if(c===6) total += 4; // -> 10
         if(c===7) total += 3;
         if(c===8) total += 2;
         if(c===9) total += 1;
       }
     }
 
+    // clamp max total
     if(total > cfg.maxTotalCents){
+      // scale down roughly
       const factor = cfg.maxTotalCents / total;
       total = Math.max(100, Math.floor(total * factor));
+      // keep reasonable cents
       total = total - (total%5);
     }
 
@@ -605,18 +601,23 @@ html
   }
 
   function generatePayment(totalCents, cfg){
+    // Choose paid >= total.
+    // Sometimes exact, often next 5/10/20/50, sometimes mixed payments.
     const choices = [];
+
+    // exact
     if(cfg.level>=2 && Math.random()<0.18) choices.push(totalCents);
 
+    // next euro, 5,10,20,50
     const totalEuro = Math.floor((totalCents + 99)/100);
     choices.push(totalEuro*100);
-
     const steps = [500,1000,2000,5000,10000];
     for(const s of steps){
       const paid = Math.ceil(totalCents / s) * s;
       choices.push(paid);
     }
 
+    // maybe 100€ at higher levels
     if(cfg.allowBigBills){
       choices.push(10000);
       choices.push(20000);
@@ -624,30 +625,36 @@ html
 
     let paidCents = pick(choices.filter(x=>x>=totalCents));
 
+    // ensure not too huge gap at low levels
     if(cfg.level<=2){
       paidCents = Math.min(paidCents, totalCents + 5000);
       if(paidCents < totalCents) paidCents = totalCents;
     }
 
+    // Mixed payments: create breakdown that sums to paidCents
     let breakdown = null;
     if(cfg.allowMixedPay && Math.random()<0.55){
       let rest = paidCents;
       breakdown = [];
+      // choose 2-4 pieces/bills
       const n = randInt(2, cfg.level>=4 ? 5 : 4);
       for(let i=0;i<n-1;i++){
-        const max = rest;
+        // choose denom not exceeding rest-total? keep feasible
+        const max = rest - (i===n-2 ? 0 : 0);
         const avail = DENOMS.filter(d => d<=max);
         const d = pick(avail);
         breakdown.push(d);
         rest -= d;
         if(rest<=0) break;
       }
-      if(rest>0) breakdown.push(rest);
+      if(rest>0) breakdown.push(rest); // last piece can be odd; acceptable in simulation
+      // Normalize: if last piece not a valid denom, convert by breaking into greedy denoms
       if(!DENOMS.includes(rest)){
         const extra = makeChangeBreakdown(rest).flatMap(([d,k]) => Array(k).fill(d));
         breakdown.pop();
         breakdown.push(...extra);
       }
+      // Shuffle
       breakdown.sort(()=>Math.random()-0.5);
     } else {
       breakdown = [paidCents];
@@ -657,19 +664,12 @@ html
   }
 
   function basketToText(basket){
-    const lang = document.getElementById('customerLang')?.value || 'fr';
     const lines = basket.items.map(it => {
       if(it.type==='weight'){
         const p = (it.pricePerKgC/100).toFixed(2).replace('.', ',');
-        if(lang === 'es'){
-          return `• ${it.name} (${it.grams} g a ${p} €/kg) = ${€(it.amountC)}`;
-        }
         return `• ${it.name} (${it.grams} g à ${p} €/kg) = ${€(it.amountC)}`;
       }
       const p = (it.priceC/100).toFixed(2).replace('.', ',');
-      if(lang === 'es'){
-        return `• ${it.name} (${it.qty} × ${p} €) = ${€(it.amountC)}`;
-      }
       return `• ${it.name} (${it.qty} × ${p} €) = ${€(it.amountC)}`;
     });
     lines.push(`\nTOTAL = ${€(basket.totalCents)}`);
@@ -684,9 +684,11 @@ html
     const steps = countingUpSteps(basket.totalCents, pay.paidCents);
     const changeCents = pay.paidCents - basket.totalCents;
 
+    // rounding (to next euro)
     const nextEuro = Math.ceil(basket.totalCents/100)*100;
-    const askCents = nextEuro - basket.totalCents;
-    const roundedChangeCents = pay.paidCents - nextEuro;
+    const askCents = nextEuro - basket.totalCents; // 0..99
+    const roundedChangeCents = pay.paidCents - nextEuro; // change if client adds askCents (and nextEuro <= paid)
+    // If nextEuro == basket.total, ask=0; still fine.
 
     state.case = {
       basket,
@@ -728,15 +730,15 @@ html
     el('paidDisplay').textContent = €(c.pay.paidCents);
 
     const cfg = levelConfig(state.level);
-    const lang = el('customerLang')?.value || 'fr';
-    el('caseMeta').textContent = `Mode niveau ${cfg.level} · ${c.basket.items.length} article(s)` + (lang === 'es' ? ' · Client ES 🇪🇸' : ' · Client FR 🇫🇷');
-
+    el('caseMeta').textContent = `Mode niveau ${cfg.level} · ${c.basket.items.length} article(s)`;
     el('paidBreakdown').textContent = `Détail: ${breakdownToString(makeChangeBreakdown(c.pay.paidCents))} (ou combo client)`;
 
+    // details
     const d = el('detailsBlock');
     d.textContent = basketToText(c.basket);
     d.style.display = state.showDetails ? 'block' : 'none';
 
+    // hints
     const h = el('hintBlock');
     const stepLines = c.steps.map(s => `- ${€(s.from)} → ${€(s.to)} : +${€(s.add)}`).join('\n');
     const chg = makeChangeBreakdown(c.changeCents);
@@ -748,36 +750,34 @@ html
     `;
     h.style.display = state.showHints ? 'block' : 'none';
 
-    // quick phrases chips (FR/ES)
-    const L = PHRASES[lang] || PHRASES.fr;
+    // quick phrases chips
     const qp = el('quickPhrases');
     qp.innerHTML = '';
-
     const ask = c.askCents;
     const roundedChange = c.roundedChangeCents;
-    const x = (ask/100).toFixed(2).replace('.', ',');
-    const y = Math.floor(roundedChange/100).toString();
-
     const chips = [];
-    chips.push(`${L.greet} · ${L.pay}`);
-
-    if(ask > 0){
-      chips.push(L.roundingAsk(x));
-      chips.push(L.roundingAsk2(x, y));
+    if(ask>0){
+      chips.push(`Si vous avez ${ (ask/100).toFixed(2).replace('.',',') } €, je vous rends ${Math.floor(roundedChange/100)} € tout rond.`);
+      chips.push(`Vous auriez ${ (ask/100).toFixed(2).replace('.',',') } € ? Comme ça je vous rends ${Math.floor(roundedChange/100)} €.`);
     } else {
-      const chgTxt = (c.changeCents/100).toFixed(2).replace('.', ',');
-      chips.push(lang==='es' ? `Perfecto, te devuelvo ${chgTxt} €.` : `Parfait, je vous rends ${chgTxt} €.`);
+      chips.push(`Parfait, c’est rond: je vous rends ${ (c.changeCents/100).toFixed(2).replace('.',',') } €.`);
     }
-    chips.push(L.thanks);
-
+    // Spanish quick lines (helpful in shop)
+    if(ask>0){
+      chips.push(`(ES) ¿Tienes ${ (ask/100).toFixed(2).replace('.',',') } €? Así te devuelvo ${Math.floor(roundedChange/100)} €.`);
+    } else {
+      chips.push(`(ES) Perfecto, te devuelvo ${ (c.changeCents/100).toFixed(2).replace('.',',') } €.`);
+    }
     for(const t of chips){
       const div = document.createElement('div');
       div.className='chip';
       div.textContent = t;
-      div.title = 'Clique pour pré-remplir (arrondi) si applicable';
+      div.title = 'Clique pour copier dans le champ (ou juste pour t’entraîner)';
       div.addEventListener('click', () => {
-        if(ask>0){
-          el('askInput').value = x;
+        // if chip contains a number for ask, fill askInput
+        const m = t.match(/(\d+[,\.]\d{2})/);
+        if(m && ask>0){
+          el('askInput').value = m[1].replace('.',',');
         }
       });
       qp.appendChild(div);
@@ -804,6 +804,7 @@ html
       el('avgTime').textContent = '--';
     }
 
+    // history
     const ul = el('history');
     ul.innerHTML = '';
     for(const h of s.history.slice(0,10)){
@@ -832,6 +833,7 @@ html
       return;
     }
 
+    // Determine expected based on rounding choice
     const canRound = c.askCents>0 && c.nextEuro<=c.pay.paidCents;
     let expectedChange = c.changeCents;
     let expectedAsk = null;
@@ -839,6 +841,7 @@ html
     if(roundingMode==='off'){
       expectedChange = c.changeCents;
     } else {
+      // If user filled askInput, interpret as they propose rounding
       const userProposes = askCentsInput!==null && askCentsInput>0;
       const shouldPropose = roundingMode==='must';
 
@@ -846,10 +849,10 @@ html
         expectedAsk = c.askCents;
         expectedChange = c.roundedChangeCents;
       } else if(shouldPropose && canRound){
-        expectedAsk = c.askCents;
+        expectedAsk = c.askCents; // required
         expectedChange = c.roundedChangeCents;
       } else {
-        expectedChange = c.changeCents;
+        expectedChange = c.changeCents; // not proposing: normal
       }
     }
 
@@ -860,11 +863,13 @@ html
       okAsk = (askCentsInput === expectedAsk);
     } else {
       if(roundingMode==='must' && canRound){
-        okAsk = false;
+        okAsk = false; // they should have asked but didn't
       }
     }
 
     const ok = okChange && okAsk;
+
+    // timing
     const t = now() - state.startTime;
 
     if(showCorrection || panic){
@@ -886,6 +891,7 @@ html
       return;
     }
 
+    // update stats
     state.stats.solved += 1;
     if(ok){
       state.stats.correct += 1;
@@ -897,6 +903,7 @@ html
       state.stats.streak = 0;
     }
 
+    // history note
     const noteParts = [];
     if(roundingMode!=='off'){
       if(canRound){
@@ -921,6 +928,7 @@ html
 
     if(ok){
       setFeedback({kind:'good', text:`✅ Juste. Temps: ${(t/1000).toFixed(1)}s\nProchain client prêt.`});
+      // auto new case after short pause
       setTimeout(newCase, 350);
     } else {
       let msg = `❌ Pas bon.\n`;
@@ -994,14 +1002,10 @@ html
     });
   });
 
-  // Switch FR/ES regenerates a case (and refreshes phrases/items)
-  el('customerLang').addEventListener('change', () => {
-    newCase();
-  });
-
   // Keyboard shortcuts
   window.addEventListener('keydown', (e) => {
     if(e.key === 'Enter'){
+      // avoid Enter when focusing select
       const tag = (document.activeElement?.tagName || '').toLowerCase();
       if(tag !== 'select') checkAnswer();
     }
@@ -1016,6 +1020,7 @@ html
   // ---------- Boot ----------
   function boot(){
     state.stats = loadStats();
+    // init ui defaults
     el('toggleHints').textContent = DEFAULTS.showHints ? 'Aide ON' : 'Aide OFF';
     el('toggleDetails').textContent = DEFAULTS.showDetails ? 'Afficher détails' : 'Masquer détails';
     state.showHints = DEFAULTS.showHints;
